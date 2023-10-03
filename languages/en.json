@@ -1,3 +1,60 @@
 {
-    "MODULE.hello": "hello"
+  "MINIONMANAGER": {
+    "Dialogs": {
+      "MinionAttack": {
+        "Title": "Minion Attack",
+        "Label": "How many minions are attacking your target?"
+      },
+      "OverkillDamage": {
+        "Title": "Overkill Damage!",
+        "Label1": "You can destroy a total of {targets} \"${name}\" minions within your weapon's range.",
+        "Label2": "Once you're happy with your targets, press OK."
+      }
+    },
+    "ActorContextMenu": {
+      "TurnIntoMinion": "Turn into minion",
+      "RevertFromMinion": "Revert minion"
+    },
+    "ItemContextMenu": {
+      "TurnIntoMinionFeature": "Set as minion group attack",
+      "RevertFromMinionFeature": "Set as regular attack"
+    },
+    "Errors": {
+      "MidiActive": "MidiQOL is required for Minion Manager to function! Please install & activate the module."
+    },
+    "Warnings": {
+    },
+    "Info": {
+    },
+    "Settings": {
+      "Debug": {
+        "Title": "Enable debugging",
+        "Hint": "Prints debug messages to the console"
+      },
+      "EnableOverkillDamage": {
+        "Title": "Enable Overkill Damage",
+        "Hint": "When enabled, if minion is hit by an attack that exceeds its hit points, the attacker is allowed to transfer the remaining damage to adjacent similar minions, repeating until the damage reaches 0."
+      },
+      "EnableGroupAttacks": {
+        "Title": "Enable Minion Group Attacks",
+        "Hint": "When enabled minion type creature attacks prompt how many of them are attacking the target."
+      },
+      "EnableGroupAttackBonus": {
+        "Title": "Enable Minion Group Attack Bonus",
+        "Hint": "When enabled, if minions attack they get a bonus to hit equal to the number of attacking minions."
+      },
+      "EnableMinionSuperSave": {
+        "Title": "Enable Minion Super Saves",
+        "Hint": "When enabled, if minions are hit by a feature that prompts a save for half damage, if the minions save, they instead take no damage."
+      },
+      "MinionFeatureName": {
+        "Title": "Minion Feature Name",
+        "Hint": "This configures the name of the feature on creatures that Minion Manager looks for to determine if each creature is a minion or not. Note: this is not case sensitive."
+      },
+      "MinionFeatureDescription": {
+        "Title": "Minion Feature Description",
+        "Hint": "This configures the description of the minion feature when it is created on creatures."
+      }
+    }
+  }
 }

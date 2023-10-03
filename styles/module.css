@@ -1,0 +1,58 @@
+div.token-image {
+    position: relative;
+    flex: 0 0 var(--sidebar-item-height);
+    height: var(--sidebar-item-height);
+    width: var(--sidebar-item-height);
+    object-fit: cover;
+    object-position: 50% 0;
+    border: none;
+}
+
+div.token-image > img.minion-group{
+    position:absolute;
+    right: 5px;
+    bottom: 5px;
+    width: 15px;
+    height: 15px;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    border-radius: 99px;
+    line-height: 15px;
+    background-color: white;
+}
+
+.grouped-initiative {
+    position: absolute;
+    left: 65px;
+    top: 112px;
+    width: 70px !important;
+    height: 70px !important;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    justify-items: center;
+}
+
+.grouped-initiative > .minion-group {
+    width: 20px;
+    height: 20px;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    border-radius: 99px;
+    background-color: white;
+    cursor: pointer;
+    position: relative;
+}
+
+.grouped-initiative > .minion-group > img {
+    opacity: 1 !important;
+    margin: 0 !important;
+    left: -1px;
+    top: -1px;
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    max-width: initial !important;
+}
