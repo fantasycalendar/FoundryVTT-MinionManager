@@ -37,15 +37,15 @@
       },
       "EnableGroupAttacks": {
         "Title": "Enable Minion Group Attacks",
-        "Hint": "When enabled minion type creature attacks prompt how many of them are attacking the target."
+        "Hint": "When enabled, minion group attacks automatically prompt to ask how many minions are attacking the target."
       },
       "EnableGroupAttackBonus": {
         "Title": "Enable Minion Group Attack Bonus",
-        "Hint": "When enabled, if minions attack they get a bonus to hit equal to the number of attacking minions."
+        "Hint": "When enabled, minions get a bonus to their group attack rolls equal to the number of attacking minions."
       },
       "EnableMinionSuperSave": {
         "Title": "Enable Minion Super Saves",
-        "Hint": "When enabled, if minions are hit by a feature that prompts a save for half damage, if the minions save, they instead take no damage."
+        "Hint": "When enabled, minions that are forced to make a saving throw, they instead take no damage if they would take half when they succeed on their saving throw."
       },
       "MinionFeatureName": {
         "Title": "Minion Feature Name",
