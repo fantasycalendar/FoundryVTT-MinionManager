@@ -133,10 +133,10 @@ export function initializeMinions() {
 
 	});
 
-	Hooks.on("preUpdateToken", (doc, change) => {
-		const actorIsMinion = api.isMinion(doc.actor);
+	Hooks.on("preUpdateActor", (doc, change) => {
+		const actorIsMinion = api.isMinion(doc);
 		if (!actorIsMinion || !hasProperty(change, "system.attributes.hp.value")) return true;
-		if (getProperty(change, "system.attributes.hp.value") < getProperty(doc.actor, "system.attributes.hp.value")) {
+		if (getProperty(change, "system.attributes.hp.value") < getProperty(doc, "system.attributes.hp.value")) {
 			change["system.attributes.hp.value"] = 0;
 		}
 		return true;
