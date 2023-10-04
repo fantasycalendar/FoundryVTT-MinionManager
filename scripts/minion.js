@@ -69,7 +69,7 @@ export function initializeMinions() {
 
 	Hooks.on("midi-qol.postCheckSaves", async (workflow) => {
 		if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_MINION_SUPER_SAVE)) return;
-		for (const savedToken in workflow.saves) {
+		for (const savedToken of workflow.saves) {
 			if (!api.isMinion(savedToken)) continue;
 			workflow.superSavers.add(savedToken);
 		}
