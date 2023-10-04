@@ -7,8 +7,10 @@
       },
       "OverkillDamage": {
         "Title": "Overkill Damage!",
-        "Label1": "You can destroy a total of {targets} \"${name}\" minions within your weapon's range.",
-        "Label2": "Once you're happy with your targets, press OK."
+        "MeleeLabel1": "You can destroy a total of {max_targets} \"{name}\" minions within your attack's range.",
+        "RangedLabel1": "You can destroy a total of {max_targets} \"{name}\" minions directly behind the original target and within your attack's range.",
+        "Label2": "Total targets remaining: {total_targets}/{max_targets}",
+        "Label3": "Once you're happy with your targets, press OK."
       }
     },
     "ActorContextMenu": {
@@ -34,6 +36,10 @@
       "EnableOverkillDamage": {
         "Title": "Enable Overkill Damage",
         "Hint": "When enabled, if minion is hit by an attack that exceeds its hit points, the attacker is allowed to transfer the remaining damage to adjacent similar minions, repeating until the damage reaches 0."
+      },
+      "EnableRangedOverkill": {
+        "Title": "Enable Ranged Overkill Damage",
+        "Hint": "When enabled, ranged attacks also trigger overkill damage. The MDCM rules allow this, so long the subsequent targets are in a line directly behind the original target."
       },
       "EnableGroupAttacks": {
         "Title": "Enable Minion Group Attacks",

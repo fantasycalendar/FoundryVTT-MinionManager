@@ -14,6 +14,8 @@ const CONSTANTS = {
 		}
 	}],
 	ATTACK_TYPES: ["mwak", "rwak", "msak", "rsak"],
+	MELEE_ATTACKS: ["mwak", "msak"],
+	RANGED_ATTACKS: ["rwak", "rsak"],
 	FLAGS: {
 		COMBATANTS: `${FLAG}.combatants`,
 		GROUP_NUMBER: `${FLAG}.groupNumber`,
@@ -25,6 +27,7 @@ const CONSTANTS = {
 CONSTANTS["SETTING_KEYS"] = {
 	DEBUG: "debug",
 	ENABLE_OVERKILL_DAMAGE: "enableOverkillDamage",
+	ENABLE_RANGED_OVERKILL: "enableRangedOverkill",
 	ENABLE_GROUP_ATTACKS: "enableGroupAttacks",
 	ENABLE_GROUP_ATTACK_BONUS: "enableGroupAttackBonus",
 	ENABLE_MINION_SUPER_SAVE: "enableMinionSuperSave",
@@ -45,6 +48,15 @@ CONSTANTS["SETTINGS"] = {
 	[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_DAMAGE]: {
 		name: "MINIONMANAGER.Settings.EnableOverkillDamage.Title",
 		hint: "MINIONMANAGER.Settings.EnableOverkillDamage.Hint",
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean
+	},
+
+	[CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL]: {
+		name: "MINIONMANAGER.Settings.EnableRangedOverkill.Title",
+		hint: "MINIONMANAGER.Settings.EnableRangedOverkill.Hint",
 		scope: "world",
 		config: true,
 		default: true,

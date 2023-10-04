@@ -81,8 +81,10 @@ export function initializeMinions() {
 
 		// Overkill management
 		const actionType = workflow.item.system?.actionType;
+		const isRangedAttack = CONSTANTS.RANGED_ATTACKS.includes(actionType);
 
-		if (!actionType || !(actionType === "mwak" || actionType === "msak")) return true;
+		if (!actionType || !CONSTANTS.ATTACK_TYPES.includes(actionType)) return true;
+		if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL) && isRangedAttack) return true;
 		if (!workflow.hitTargets.size) return true;
 
 		const hitTarget = Array.from(workflow.hitTargets)[0]
@@ -98,26 +100,48 @@ export function initializeMinions() {
 		damageTotal -= minionHP;
 
 		const closestTokens = new Set(canvas.tokens.placeables
-			.filter(_token => hitTarget.actor.name === _token.actor.name && canvas.grid.measureDistance(workflow.token, _token) <= workflow.item.system.range.value + 2.5)
+			.filter(_token => {
+				const withinRange = canvas.grid.measureDistance(workflow.token, _token) <= workflow.item.system.range.value + 2.5;
+				return hitTarget.actor.name === _token.actor.name && withinRange;
+			})
 			.sort((a, b) => canvas.grid.measureDistance(workflow.token, b) - canvas.grid.measureDistance(workflow.token, a)));
 
-		closestTokens.delete(game.user.targets.first())
+		closestTokens.delete(game.user.targets.first());
 
 		let maxAdditionalTargets = Math.ceil(damageTotal / minionHP);
 		Array.from(closestTokens)
 			.slice(0, maxAdditionalTargets)
 			.forEach(_token => _token.setTarget(true, { releaseOthers: false }));
 
-		await Dialog.confirm({
+		const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (isRangedAttack ? "RangedLabel1" : "MeleeLabel1");
+		const label1 = game.i18n.format(label1Localization, {
+			max_targets: maxAdditionalTargets + 1,
+			total_targets: game.user.targets.size,
+			name: hitTarget.actor.name
+		});
+
+		let label2 = game.i18n.format("MINIONMANAGER.Dialogs.OverkillDamage.Label2", {
+			max_targets: maxAdditionalTargets + 1,
+			total_targets: game.user.targets.size
+		});
+
+		let targetingHookId = false;
+		await Dialog.prompt({
 			"title": game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Title"),
 			"content": `
-	    <p style='text-align:center;'>${game.i18n.format("MINIONMANAGER.Dialogs.OverkillDamage.Label1", {
-				targets: maxAdditionalTargets + 1,
-				name: hitTarget.actor.name
-			})}</p>
-	    <p style='text-align:center;'>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Label2")}</p>
+	    <p style='text-align:center;'>${label1}</p>
+	    <p style='text-align:center;' class="minion-manager-targets">${label2}</p>
+	    <p style='text-align:center;'>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Label3")}</p>
 	  `,
 			"rejectClose": false,
+			render: (html) => {
+				targetingHookId = Hooks.on("targetToken", () => {
+					html.find(".minion-manager-targets").text(game.i18n.format("MINIONMANAGER.Dialogs.OverkillDamage.Label2", {
+						max_targets: maxAdditionalTargets + 1,
+						total_targets: game.user.targets.size
+					}))
+				})
+			},
 			options: { top: 150 }
 		});
 
@@ -127,7 +151,12 @@ export function initializeMinions() {
 
 		userTargets.delete(hitTarget);
 
-		[...userTargets].slice(0, maxAdditionalTargets).forEach(target => workflow.hitTargets.add(target));
+		await MidiQOL.applyTokenDamage(
+			workflow.damageDetail,
+			workflow.damageTotal,
+			new Set([...userTargets].slice(0, maxAdditionalTargets)),
+			workflow.item
+		)
 
 		return true;
 
