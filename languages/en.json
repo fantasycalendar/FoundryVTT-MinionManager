@@ -7,8 +7,8 @@
       },
       "OverkillDamage": {
         "Title": "Overkill Damage!",
-        "MeleeLabel1": "You can destroy a total of {max_targets} \"{name}\" minions within your attack's range.",
-        "RangedLabel1": "You can destroy a total of {max_targets} \"{name}\" minions directly behind the original target and within your attack's range.",
+        "MeleeLabel1": "You can destroy a total of {max_targets} \"{name}\" minions within your weapon's range.",
+        "RangedLabel1": "You can destroy a total of {max_targets} \"{name}\" minions directly behind the original target and within your weapon's range.",
         "Label2": "Total targets remaining: {total_targets}/{max_targets}",
         "Label3": "Once you're happy with your targets, press OK."
       }

@@ -14,8 +14,6 @@ const CONSTANTS = {
 		}
 	}],
 	ATTACK_TYPES: ["mwak", "rwak", "msak", "rsak"],
-	MELEE_ATTACKS: ["mwak", "msak"],
-	RANGED_ATTACKS: ["rwak", "rsak"],
 	FLAGS: {
 		COMBATANTS: `${FLAG}.combatants`,
 		GROUP_NUMBER: `${FLAG}.groupNumber`,

@@ -81,10 +81,11 @@ export function initializeMinions() {
 
 		// Overkill management
 		const actionType = workflow.item.system?.actionType;
-		const isRangedAttack = CONSTANTS.RANGED_ATTACKS.includes(actionType);
+		const isWeaponMeleeAttack = actionType === "mwak";
+		const isWeaponRangedAttack = actionType === "rwak";
 
-		if (!actionType || !CONSTANTS.ATTACK_TYPES.includes(actionType)) return true;
-		if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL) && isRangedAttack) return true;
+		if (!actionType || !(isWeaponMeleeAttack || isWeaponRangedAttack)) return true;
+		if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL) && isWeaponRangedAttack) return true;
 		if (!workflow.hitTargets.size) return true;
 
 		const hitTarget = Array.from(workflow.hitTargets)[0]
@@ -113,7 +114,7 @@ export function initializeMinions() {
 			.slice(0, maxAdditionalTargets)
 			.forEach(_token => _token.setTarget(true, { releaseOthers: false }));
 
-		const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (isRangedAttack ? "RangedLabel1" : "MeleeLabel1");
+		const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (isWeaponRangedAttack ? "RangedLabel1" : "MeleeLabel1");
 		const label1 = game.i18n.format(label1Localization, {
 			max_targets: maxAdditionalTargets + 1,
 			total_targets: game.user.targets.size,
