@@ -5,9 +5,9 @@ import vanilla from "./plugins/vanilla.js";
 
 export function initializeMinions() {
 
-	if(CONSTANTS.MODULES.MIDI){
+	if (CONSTANTS.MODULES.MIDI) {
 		midiqol.initializeMinions();
-	}else{
+	} else {
 		vanilla.initializeMinions();
 	}
 
