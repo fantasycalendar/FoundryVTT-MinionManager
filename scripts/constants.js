@@ -19,6 +19,9 @@ const CONSTANTS = {
 		GROUP_NUMBER: `${FLAG}.groupNumber`,
 		DELETE_GROUP_NUMBER: `${FLAG}.-=groupNumber`,
 		MIDI_GROUP_ATTACK: "flags.midiProperties.grpact",
+	},
+	MODULES: {
+		MIDI: false
 	}
 }
 

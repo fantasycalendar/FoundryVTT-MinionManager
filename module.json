@@ -3,7 +3,8 @@
   "title": "Minion Manager",
   "description": "This module helps you manage minions, specifically MCDM style minions from Flee, Mortals!",
   "version": "#{VERSION}#",
-  "library": "false",
+  "library": false,
+  "socket": true,
   "manifestPlusVersion": "1.2.0",
   "compatibility": {
     "minimum": 10,
@@ -30,11 +31,7 @@
           "minimum": "2.0.3"
         }
       }
-    ],
-    "requires": [{
-      "id": "midi-qol",
-      "type": "module"
-    }]
+    ]
   },
   "esmodules": [
     "scripts/module.js"
