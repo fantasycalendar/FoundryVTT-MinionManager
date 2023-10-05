@@ -33,9 +33,17 @@ Minion Manager is a module that automates the MCDM "Flee, Mortals!" minion rules
 
 These are all configurable through the module's settings.
 
+## Minions & Group Attacks
+
+You can right-click on actors to turn them into minions, and then right-click on their attacks to turn them into group attacks.
+
+![Turning a token into a minion](docs/right-click-actor.png) ![Turning a minion's attack into a group attack](docs/right-click-item.png)
+
 ## Group Initiative
 
-You can set this by right-clicking on the token "add to initiative" button to open the group initiative interface - clicking on a number within that UI moves all the selected tokens into that initiative group.
+You can set this by right-clicking on the token HUD's "add to initiative" button to open the group initiative interface - clicking on a number within that UI moves all the selected tokens into that initiative group.
+
+Reducing or deleting any characters of a group does not affect the combat tracker, unless all of them are deleted or marked as defeated.
 
 ## Where can I find the minion rules?
 
@@ -59,50 +67,51 @@ You can access the API through `game.modules.get("minionmanager").api`
 
 ### setGroupInitiative
 
-<code>setGroupInitiative(targets, groupNumber) ⇒ boolean | Promise&lt;Array&lt;Document&lt;any, Scene&gt;&gt;&gt;</code>
+<code>game.modules.get("minionmanager").api.setGroupInitiative(targets, groupNumber) ⇒ boolean | Promise&lt;Array&lt;Document&lt;any, Scene&gt;&gt;&gt;</code>
 
 Sets the group initiative of a set of tokens or actors.
 
 **Kind**: global function
 
-| Param | Description |
-| --- | --- |
-| targets | The targets to set the group initiative for |
-| groupNumber | The group initiative to set on the targets |
+| Param | Type                                                                                         | Description                                          |
+| --- |----------------------------------------------------------------------------------------------|------------------------------------------------------|
+| targets | <code>Array&lt;string/Token/TokenDocument/Actor&gt;/Atring/Token/TokenDocument/Actor</code>  | The targets to add to the group initiative |
+| groupNumber | <code>Number</code>                                                                          | The group initiative to set on the targets           |
 
 <a name="removeGroupInitiative"></a>
 
 ### removeGroupInitiative
 
-<code>removeGroupInitiative(targets) ⇒ boolean | Promise&lt;Array&lt;Document&lt;any, Scene&gt;&gt;&gt;</code>
+<code>game.modules.get("minionmanager").api.removeGroupInitiative(targets) ⇒ boolean | Promise&lt;Array&lt;Document&lt;any, Scene&gt;&gt;&gt;</code>
 
 Removes the group initiative of a set of tokens or actors.
 
 **Kind**: global function
 
-| Param | Description |
-| --- | --- |
-| targets | The targets to remove the group initiative from |
+| Param | Type | Description |
+| --- | --- |-------------|
+| targets | <code>Array&lt;string/Token/TokenDocument/Actor&gt;/Atring/Token/TokenDocument/Actor</code> | The targets to remove the group initiative from |
+
 
 <a name="getActors"></a>
 
 ### getActors
 
-<code>getActors(targets) ⇒ Array&lt;Actor&gt;</code>
+<code>game.modules.get("minionmanager").api.getActors(targets) ⇒ Array&lt;Actor&gt;</code>
 
 Helper function - turns a list of UUID strings/tokens/token documents into a list of the respective actors
 
 **Kind**: global function
 
-| Param | Type |
-| --- | --- |
-| targets | <code>Array&lt;string|Token|TokenDocument|Actor&gt; | stringTokenTokenDocumentActor</code> |
+| Param | Type                                                                                         |
+| --- |----------------------------------------------------------------------------------------------|
+| targets | <code>Array&lt;string/Token/TokenDocument/Actor&gt;/Atring/Token/TokenDocument/Actor</code> |
 
 <a name="turnIntoMinions"></a>
 
 ### turnIntoMinions
 
-<code>turnIntoMinions(actors) ⇒ Promise&lt;void&gt;</code>
+<code>game.modules.get("minionmanager").api.turnIntoMinions(actors) ⇒ Promise&lt;void&gt;</code>
 
 Turns the given actors into minions by creating a minion feature document on the actor.
 
@@ -116,7 +125,7 @@ Turns the given actors into minions by creating a minion feature document on the
 
 ### revertMinions
 
-<code>revertMinions(actors) ⇒ Promise&lt;void&gt;</code>
+<code>game.modules.get("minionmanager").api.revertMinions(actors) ⇒ Promise&lt;void&gt;</code>
 
 Removes the minion feature from a set of actors, turning them back into normal actors.
 
@@ -130,7 +139,7 @@ Removes the minion feature from a set of actors, turning them back into normal a
 
 ### isMinion
 
-<code>isMinion(target) ⇒ boolean</code>
+<code>game.modules.get("minionmanager").api.isMinion(target) ⇒ boolean</code>
 
 Helper function - returns true or false whether the given target is a minion or not
 
@@ -144,7 +153,7 @@ Helper function - returns true or false whether the given target is a minion or 
 
 ### setActorItemToGroupAttack
 
-<code>setActorItemToGroupAttack(item, isGroupAttack) ⇒ Promise&lt;Item&gt;</code>
+<code>game.modules.get("minionmanager").api.setActorItemToGroupAttack(item, isGroupAttack) ⇒ Promise&lt;Item&gt;</code>
 
 Helper function - sets the given item to become a group attack type feature
 
@@ -159,7 +168,7 @@ Helper function - sets the given item to become a group attack type feature
 
 ### isItemGroupAttack
 
-<code>isItemGroupAttack(item) ⇒ boolean</code>
+<code>game.modules.get("minionmanager").api.isItemGroupAttack(item) ⇒ boolean</code>
 
 Helper function - returns whether the given item is a group attack type feature
 
@@ -173,7 +182,7 @@ Helper function - returns whether the given item is a group attack type feature
 
 ### turnActorAttacksIntoGroupActions
 
-<code>turnActorAttacksIntoGroupActions(actors) ⇒ Promise&lt;void&gt;</code>
+<code>game.modules.get("minionmanager").api.turnActorAttacksIntoGroupActions(actors) ⇒ Promise&lt;void&gt;</code>
 
 Turns every feature or item on a given actor into group attack type features
 
@@ -187,7 +196,7 @@ Turns every feature or item on a given actor into group attack type features
 
 ### revertActorAttacksFromGroupActions
 
-<code>revertActorAttacksFromGroupActions(actors) ⇒ Promise&lt;void&gt;</code>
+<code>game.modules.get("minionmanager").api.revertActorAttacksFromGroupActions(actors) ⇒ Promise&lt;void&gt;</code>
 
 Reverts every feature or item on a given actor back into a normal item from being a group attack type feature
 

@@ -6,8 +6,8 @@ import { getSetting } from "./lib.js";
 /**
  * Sets the group initiative of a set of tokens or actors.
  *
- * @param targets           The targets to set the group initiative for
- * @param groupNumber       The group initiative to set on the targets
+ * @param {Array<string|Token|TokenDocument|Actor>|string|Token|TokenDocument|Actor} targets           The targets to set the group initiative for
+ * @param {Number} groupNumber       The group initiative to set on the targets
  * @returns {boolean|Promise<Array<Document<any, Scene>>>}
  */
 export function setGroupInitiative(targets, groupNumber = 1) {
@@ -39,7 +39,7 @@ export function setGroupInitiative(targets, groupNumber = 1) {
 /**
  * Removes the group initiative of a set of tokens or actors.
  *
- * @param targets           The targets to remove the group initiative from
+ * @param {Array<string|Token|TokenDocument|Actor>|string|Token|TokenDocument|Actor} targets           The targets to remove the group initiative from
  * @returns {boolean|Promise<Array<Document<any, Scene>>>}
  */
 export function removeGroupInitiative(targets) {
