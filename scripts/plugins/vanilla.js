@@ -1,6 +1,7 @@
 import * as lib from "../lib.js";
 import CONSTANTS from "../constants.js";
 import * as api from "../api.js";
+import { getActiveGM } from "../lib.js";
 
 export default {
 
@@ -121,6 +122,44 @@ export default {
 
 			}
 
+		});
+
+
+		Hooks.on("dnd5e.rollDamage", async (item, damageRoll) => {
+
+			const validAttack = lib.isValidOverkillItem(item);
+			if(!validAttack) return true;
+
+			const hitTargets = Array.from(game.user.targets)
+
+			if(!hitTargets.length) return true;
+
+			const hitTarget = hitTargets[0];
+
+			if (!api.isMinion(hitTarget) || api.isMinion(item.parent)) return true;
+
+			let damageTotal = damageRoll.total;
+
+			const minionHP = getProperty(hitTarget.actor, "system.attributes.hp.value");
+
+			if ((minionHP - damageTotal) > 0) return true;
+
+			damageTotal -= minionHP;
+
+			let maxAdditionalTargets = Math.ceil(damageTotal / minionHP);
+
+			const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (validAttack.isValidRangedAttack ? "RangedLabel1" : "MeleeLabel1");
+			const label1 = game.i18n.format(label1Localization, {
+				max_targets: maxAdditionalTargets + 1,
+				total_targets: game.user.targets.size,
+				name: hitTarget.actor.name
+			});
+
+			if(lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
+				ChatMessage.create({
+					content: `<h2>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Title")}</h2><p>${label1}</p>`
+				});
+			}
 		});
 
 	}

@@ -1,6 +1,7 @@
 import CONSTANTS from "./constants.js";
 import { refreshInitiativeGroupGraphics } from "./initiative.js";
 import * as api from "./api.js";
+import { libWrapper } from "./libwrapper/shim.js";
 
 export function initializeInterface() {
 
@@ -40,7 +41,7 @@ export function initializeInterface() {
 
 			const extra = $(`<div class="control-icon grouped-initiative"></div>`);
 
-			for (const index in Array(9).fill(0)) {
+			for (let index = 0; index < 9; index++) {
 
 				const newGroupNumber = Number(index) + 1;
 
@@ -53,10 +54,10 @@ export function initializeInterface() {
 					const tokensKeptInOldGroup = canvas.scene.tokens.filter(oldToken => {
 						const tokenGroupNumber = getProperty(oldToken, CONSTANTS.FLAGS.GROUP_NUMBER);
 						return !newTokens.includes(oldToken) && existingGroupNumber && tokenGroupNumber && existingGroupNumber === tokenGroupNumber;
-					})
+					});
 
 					const existingCombatantGroup = game.combats.viewed.combatants.find(combatant => {
-						return getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === existingGroupNumber;
+						return existingGroupNumber && getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === existingGroupNumber;
 					});
 
 					if (existingCombatantGroup && !tokensKeptInOldGroup.length) {
@@ -137,9 +138,7 @@ export function initializeInterface() {
 				turn.css = turn.css.replace("defeated", "");
 			}
 		}
-
 		return data;
-
 	}, "WRAPPER");
 
 	Hooks.on("preUpdateCombatant", (combatant, data) => {

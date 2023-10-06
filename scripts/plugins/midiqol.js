@@ -1,6 +1,7 @@
 import * as lib from "../lib.js";
 import CONSTANTS from "../constants.js";
 import * as api from "../api.js";
+import { isValidOverkillItem } from "../lib.js";
 
 export default {
 
@@ -79,15 +80,8 @@ export default {
 
 		Hooks.on("midi-qol.preDamageRollComplete", async (workflow) => {
 
-			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_DAMAGE)) return true;
-
-			// Overkill management
-			const actionType = workflow.item.system?.actionType;
-			const isWeaponMeleeAttack = actionType === "mwak";
-			const isWeaponRangedAttack = actionType === "rwak";
-
-			if (!actionType || !(isWeaponMeleeAttack || isWeaponRangedAttack)) return true;
-			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL) && isWeaponRangedAttack) return true;
+			const validAttack = lib.isValidOverkillItem(workflow.item);
+			if(!validAttack) return true;
 			if (!workflow.hitTargets.size) return true;
 
 			const hitTarget = Array.from(workflow.hitTargets)[0]
@@ -116,7 +110,7 @@ export default {
 				.slice(0, maxAdditionalTargets)
 				.forEach(_token => _token.setTarget(true, { releaseOthers: false }));
 
-			const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (isWeaponRangedAttack ? "RangedLabel1" : "MeleeLabel1");
+			const label1Localization = "MINIONMANAGER.Dialogs.OverkillDamage." + (validAttack.isValidRangedAttack ? "RangedLabel1" : "MeleeLabel1");
 			const label1 = game.i18n.format(label1Localization, {
 				max_targets: maxAdditionalTargets + 1,
 				total_targets: game.user.targets.size,
@@ -159,7 +153,13 @@ export default {
 				workflow.damageTotal,
 				new Set([...userTargets].slice(0, maxAdditionalTargets)),
 				workflow.item
-			)
+			);
+
+			if(lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
+				ChatMessage.create({
+					content: `<h2>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Title")}</h2><p>${label1}</p>`
+				});
+			}
 
 			return true;
 

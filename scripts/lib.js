@@ -20,3 +20,26 @@ export function log(msg, args = {}) {
 export function getSetting(key) {
 	return game.settings.get(CONSTANTS.MODULE_NAME, key);
 }
+
+export function isValidOverkillItem(item) {
+
+	if (!getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_DAMAGE)) return false;
+
+	const actionType = item.system?.actionType;
+
+	const spellsAllowed = getSetting(CONSTANTS.SETTING_KEYS.ENABLE_SPELL_OVERKILL)
+	const isValidMeleeAttack = actionType === "mwak" || (spellsAllowed && actionType === "msak");
+	const isValidRangedAttack = actionType === "rwak" || (spellsAllowed && actionType === "rsak");
+
+	if (!actionType || !(isValidMeleeAttack || isValidRangedAttack)) return false;
+	if (!getSetting(CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL) && isValidRangedAttack) return false;
+
+	return { isValidMeleeAttack, isValidRangedAttack };
+
+}
+
+export function getActiveGM(){
+	return game.users
+		.filter(u => u.active && u.isGM)
+		.sort((a, b) => a.isGM && !b.isGM ? -1 : 1)?.[0];
+}

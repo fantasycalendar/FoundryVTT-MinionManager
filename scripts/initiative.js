@@ -19,7 +19,7 @@ export function refreshInitiativeGroupGraphics(t) {
 			existingSprite.turn = minionTurn;
 		}
 
-		const diameter = 24
+		const diameter = 24 * (canvas.grid.size / 100) * tokenDocument.width;
 		const x = (tokenDocument.width * canvas.grid.size) - diameter - 4;
 		const y = (tokenDocument.height * canvas.grid.size) - diameter - 4;
 
@@ -40,7 +40,7 @@ export function refreshInitiativeGroupGraphics(t) {
 				background.width = diameter;
 				background.height = diameter;
 				background.beginFill(0xFFFFFF)
-					.drawCircle((diameter / 2), (diameter / 2), (diameter / 2) - 2)
+					.drawCircle((diameter / 2), (diameter / 2), Math.max(1, (diameter-2)/2))
 					.endFill();
 
 				sprite._background = background;
@@ -98,17 +98,24 @@ export function initializeInitiative() {
 
 	Hooks.on("refreshToken", refreshInitiativeGroupGraphics);
 
+	Hooks.on("preCreateCombatant", (doc) => {
+		const createdCombatantToken = doc.token;
+		const groupNumber = getProperty(createdCombatantToken, CONSTANTS.FLAGS.GROUP_NUMBER);
+		if (!groupNumber || !game.combats.viewed) return true;
+		return !game.combats.viewed.combatants.some(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+	})
+
 	let tokenBeingDeleted = false;
 	Hooks.on("preDeleteToken", (doc) => {
 		tokenBeingDeleted = doc.id;
 	})
 
 	Hooks.on("preDeleteCombatant", (combatant) => {
-		if (tokenBeingDeleted !== combatant.tokenId) return;
+		if (tokenBeingDeleted !== combatant.tokenId) return true;
 		const existingSubCombatants = foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS));
-		if (!existingSubCombatants?.length) return;
+		if (!existingSubCombatants?.length) return true;
 		const newToken = existingSubCombatants.map(uuid => fromUuidSync(uuid)).filter(foundToken => foundToken?.actor?.id);
-		if (!newToken.length) return;
+		if (!newToken.length) return true;
 		combatant.update({
 			actorId: newToken[0].actor.id,
 			tokenId: newToken[0].id

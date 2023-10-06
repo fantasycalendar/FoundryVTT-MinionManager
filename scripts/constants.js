@@ -29,6 +29,8 @@ CONSTANTS["SETTING_KEYS"] = {
 	DEBUG: "debug",
 	ENABLE_OVERKILL_DAMAGE: "enableOverkillDamage",
 	ENABLE_RANGED_OVERKILL: "enableRangedOverkill",
+	ENABLE_SPELL_OVERKILL: "enableSpellOverkill",
+	ENABLE_OVERKILL_MESSAGE: "enableOverkillMessage",
 	ENABLE_GROUP_ATTACKS: "enableGroupAttacks",
 	ENABLE_GROUP_ATTACK_BONUS: "enableGroupAttackBonus",
 	ENABLE_MINION_SUPER_SAVE: "enableMinionSuperSave",
@@ -58,6 +60,24 @@ CONSTANTS["SETTINGS"] = {
 	[CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL]: {
 		name: "MINIONMANAGER.Settings.EnableRangedOverkill.Title",
 		hint: "MINIONMANAGER.Settings.EnableRangedOverkill.Hint",
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean
+	},
+
+	[CONSTANTS.SETTING_KEYS.ENABLE_SPELL_OVERKILL]: {
+		name: "MINIONMANAGER.Settings.EnableSpellOverkill.Title",
+		hint: "MINIONMANAGER.Settings.EnableSpellOverkill.Hint",
+		scope: "world",
+		config: true,
+		default: false,
+		type: Boolean
+	},
+
+	[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE]: {
+		name: "MINIONMANAGER.Settings.EnableOverkillMessage.Title",
+		hint: "MINIONMANAGER.Settings.EnableOverkillMessage.Hint",
 		scope: "world",
 		config: true,
 		default: true,

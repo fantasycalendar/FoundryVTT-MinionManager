@@ -7,8 +7,8 @@
       },
       "OverkillDamage": {
         "Title": "Overkill Damage!",
-        "MeleeLabel1": "You can destroy a total of {max_targets} \"{name}\" minions within your weapon's range.",
-        "RangedLabel1": "You can destroy a total of {max_targets} \"{name}\" minions directly behind the original target and within your weapon's range.",
+        "MeleeLabel1": "You can destroy a total of {max_targets} \"{name}\" minions within your attack's range.",
+        "RangedLabel1": "You can destroy a total of {max_targets} \"{name}\" minions directly behind the original target and within your attack's range.",
         "Label2": "Total targets remaining: {total_targets}/{max_targets}",
         "Label3": "Once you're happy with your targets, press OK."
       }
@@ -40,6 +40,14 @@
       "EnableRangedOverkill": {
         "Title": "Enable Ranged Overkill Damage",
         "Hint": "When enabled, ranged attacks also trigger overkill damage. The MDCM rules allow this, so long the subsequent targets are in a line directly behind the original target."
+      },
+      "EnableSpellOverkill": {
+        "Title": "Enable Spell Attack Overkill Damage",
+        "Hint": "When enabled, melee and ranged spell attacks also trigger overkill damage. By default, MCDM rules does not allow this."
+      },
+      "EnableOverkillMessage": {
+        "Title": "Enable Overkill Message",
+        "Hint": "When enabled, overkill chat messages are shown."
       },
       "EnableGroupAttacks": {
         "Title": "Enable Minion Group Attacks",
