@@ -28,14 +28,16 @@ export default {
 				options: { height: "100%" }
 			})
 
-			const numMinionsAttacked = Number(result) || 1;
-			minionAttacks[workflow.id] = numMinionsAttacked;
+			const numberOfMinions = Math.max(1, Number(result) || 1)
+			minionAttacks[workflow.id] = numberOfMinions;
 
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) return true;
 
 			const attackHookId = Hooks.on("dnd5e.preRollAttack", (rolledItem, rollConfig) => {
 				if (rolledItem !== workflow.item) return true;
-				rollConfig.parts.push(numMinionsAttacked);
+				rollConfig.data.numberOfMinions = numberOfMinions;
+				const containsNumberOfMinions = rollConfig.parts.some(part => part[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS))
+				if(!containsNumberOfMinions) rollConfig.parts.push(CONSTANTS.NUMBER_MINIONS_BONUS);
 				Hooks.off("dnd5e.preRollAttack", attackHookId);
 				return true;
 			});
@@ -45,30 +47,46 @@ export default {
 
 		Hooks.on("midi-qol.preDamageRoll", async (workflow) => {
 
-			if (!minionAttacks?.[workflow.id]) return true;
 			if (workflow.item.system?.damage?.parts?.length < 1) return true;
 
-			const newDamageParts = [];
+			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
 
-			for (let index = 0; index < workflow.item.system.damage.parts.length; index++) {
-				const firstDamage = workflow.item.system.damage.parts[index][0];
-				const newFormula = isNaN(Number(firstDamage))
-					? "(" + firstDamage.toString() + " * " + minionAttacks[workflow.id].toString() + ")"
-					: Number(firstDamage) * minionAttacks[workflow.id];
-				const damageType = workflow.item.system.damage.parts[index][1];
-				newDamageParts.push(`${newFormula}${damageType ? `[${damageType}]` : ""}`);
+			const isGroupAttack = getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+
+			if (!api.isMinion(workflow.actor) || !isGroupAttack) return true;
+
+			if (!minionAttacks?.[workflow.id]) {
+
+				const result = await Dialog.confirm({
+					title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
+					content: `
+        <p>${game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Label")}</p>
+        <p><input name="numberOfAttacks" type="number" value="1"></p>
+      `,
+					yes: (html) => {
+						return html.find('input[name="numberOfAttacks"]').val()
+					},
+					options: { height: "100%" }
+				})
+
+				minionAttacks[workflow.id] = Math.max(1, Number(result) || 1);
+
 			}
 
-			delete minionAttacks[workflow.id];
+			const numberOfMinions = minionAttacks[workflow.id];
 
 			const damageHookId = Hooks.on("dnd5e.preRollDamage", (rolledItem, rollConfig) => {
 				if (rolledItem !== workflow.item) return true;
-				rollConfig.parts = newDamageParts;
+				rollConfig.data.numberOfMinions = numberOfMinions;
+				rollConfig.parts = lib.patchItemDamageRollConfig(workflow.item);
 				Hooks.off("dnd5e.preRollDamage", damageHookId);
 				return true;
 			});
 
+			delete minionAttacks[workflow.id];
+
 			return true;
+
 		});
 
 		Hooks.on("midi-qol.postCheckSaves", async (workflow) => {

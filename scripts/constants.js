@@ -14,6 +14,7 @@ const CONSTANTS = {
 		}
 	}],
 	ATTACK_TYPES: ["mwak", "rwak", "msak", "rsak"],
+	NUMBER_MINIONS_BONUS: "@numberOfMinions",
 	FLAGS: {
 		COMBATANTS: `${FLAG}.combatants`,
 		GROUP_NUMBER: `${FLAG}.groupNumber`,

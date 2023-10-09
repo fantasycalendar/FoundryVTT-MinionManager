@@ -38,8 +38,14 @@ export function isValidOverkillItem(item) {
 
 }
 
-export function getActiveGM() {
-	return game.users
-		.filter(u => u.active && u.isGM)
-		.sort((a, b) => a.isGM && !b.isGM ? -1 : 1)?.[0];
+
+export function patchItemDamageRollConfig(item){
+	return (item.system?.damage?.parts ?? []).map((part) => {
+		const firstDamage = part[0].toString();
+		const containsNumberOfMinions = firstDamage.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
+		const newFormula = containsNumberOfMinions ? firstDamage : `(${firstDamage} * ${CONSTANTS.NUMBER_MINIONS_BONUS})`;
+		const damageType = part[1];
+
+		return `${newFormula}${damageType ? `[${damageType}]` : ""}`
+	})
 }

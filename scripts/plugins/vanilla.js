@@ -18,7 +18,6 @@ export default {
 
 			// If we've already prompted the user, and the attack hasn't gone through, then we continue the original attack
 			if (minionAttacks[item.parent.uuid] && !minionAttacks[item.parent.uuid].attacked) {
-				rollConfig.parts = minionAttacks[item.parent.uuid].rollConfig.parts;
 				minionAttacks[item.parent.uuid].attacked = true;
 				return true;
 			}
@@ -35,15 +34,19 @@ export default {
 				options: { height: "100%" }
 			}).then(result => {
 
-				const numMinionsAttacked = Number(result) || 1;
+				const numberOfMinions = Math.max(1, Number(result) || 1);
 
+				minionAttacks[item.parent.uuid] = {
+					numberOfMinions,
+					attacked: false
+				};
+
+				rollConfig.data.numberOfMinions = numberOfMinions;
 				if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
-					rollConfig.parts.push(numMinionsAttacked);
+					const containsNumberOfMinions = rollConfig.parts.some(part => part[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS))
+					if (!containsNumberOfMinions) rollConfig.parts.push(CONSTANTS.NUMBER_MINIONS_BONUS);
 				}
 
-				minionAttacks[item.parent.uuid] = { numMinionsAttacked, rollConfig, attacked: false };
-
-				// Roll the attack with the existing config, which just includes the minion bonus
 				item.rollAttack(rollConfig);
 
 			});
@@ -52,8 +55,6 @@ export default {
 
 		});
 
-		const minionOnlyDamages = {};
-
 		Hooks.on("dnd5e.preRollDamage", (item, rollConfig) => {
 
 			if (item.system?.damage?.parts?.length < 1) return true;
@@ -61,49 +62,16 @@ export default {
 			const isGroupAttack = getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 			if (!api.isMinion(item.parent) || !isGroupAttack) return true;
 
-			if (minionAttacks?.[item.parent.uuid]) {
+			if (minionAttacks?.[item.parent.uuid] && minionAttacks?.[item.parent.uuid].attacked) {
 
-				for (let index = 0; index < item.system.damage.parts.length; index++) {
-
-					const firstDamage = item.system.damage.parts[index][0];
-					const newFormula = isNaN(Number(firstDamage))
-						? "(" + firstDamage.toString() + " * " + minionOnlyDamages[item.parent.uuid].numMinionsAttacked.toString() + ")"
-						: Number(firstDamage) * minionOnlyDamages[item.parent.uuid].numMinionsAttacked;
-
-					const damageType = item.system.damage.parts[index][1];
-
-					if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
-						rollConfig.parts[index] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
-					}
-				}
+				rollConfig.data.numberOfMinions = minionAttacks[item.parent.uuid].numberOfMinions;
+				rollConfig.parts = lib.patchItemDamageRollConfig(item);
 
 				delete minionAttacks[item.parent.uuid];
 
 				return true;
 
-			} else {
-
-				// If we've already prompted the user, and the attack hasn't gone through, then we continue the original attack
-				if (minionOnlyDamages[item.parent.uuid] && !minionOnlyDamages[item.parent.uuid].attacked) {
-
-					for (let index = 0; index < item.system.damage.parts.length; index++) {
-
-						const firstDamage = item.system.damage.parts[index][0];
-						const newFormula = isNaN(Number(firstDamage))
-							? "(" + firstDamage.toString() + " * " + minionOnlyDamages[item.parent.uuid].numMinionsAttacked.toString() + ")"
-							: Number(firstDamage) * minionOnlyDamages[item.parent.uuid].numMinionsAttacked;
-
-						const damageType = item.system.damage.parts[index][1];
-
-						if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
-							rollConfig.parts[index] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
-						}
-					}
-
-					delete minionOnlyDamages[item.parent.uuid];
-
-					return true;
-				}
+			} else if (!minionAttacks?.[item.parent.uuid]){
 
 				Dialog.confirm({
 					title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
@@ -117,9 +85,10 @@ export default {
 					options: { height: "100%" }
 				}).then(result => {
 
-					const numMinionsAttacked = Number(result) || 1;
-
-					minionOnlyDamages[item.parent.uuid] = { numMinionsAttacked, rollConfig, attacked: false };
+					minionAttacks[item.parent.uuid] = {
+						numberOfMinions: Math.max(1, Number(result) || 1),
+						attacked: true
+					};
 
 					// Roll the damage with the existing config, which just includes the minion bonus
 					item.rollDamage(rollConfig);

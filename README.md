@@ -39,6 +39,12 @@ You can right-click on actors to turn them into minions, and then right-click on
 
 ![Turning a token into a minion](docs/right-click-actor.png) ![Turning a minion's attack into a group attack](docs/right-click-item.png)
 
+You can also include the identifier `@numberOfMinions` anywhere in the attacks to reference the number of minion attacking. 
+
+**Note:** This is automatically included in any damage part that does not already have it. 
+
+![Number of minions modifier in the damage](docs/number-of-minions.png)
+
 ## Group Initiative
 
 You can set this by right-clicking on the token HUD's "add to initiative" button to open the group initiative interface - clicking on a number within that UI moves all the selected tokens into that initiative group.
