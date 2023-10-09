@@ -40,7 +40,7 @@ export function refreshInitiativeGroupGraphics(t) {
 				background.width = diameter;
 				background.height = diameter;
 				background.beginFill(0xFFFFFF)
-					.drawCircle((diameter / 2), (diameter / 2), Math.max(1, (diameter-2)/2))
+					.drawCircle((diameter / 2), (diameter / 2), Math.max(1, (diameter - 2) / 2))
 					.endFill();
 
 				sprite._background = background;

@@ -1,7 +1,6 @@
 import * as lib from "../lib.js";
 import CONSTANTS from "../constants.js";
 import * as api from "../api.js";
-import { isValidOverkillItem } from "../lib.js";
 
 export default {
 
@@ -36,7 +35,6 @@ export default {
 
 			const attackHookId = Hooks.on("dnd5e.preRollAttack", (rolledItem, rollConfig) => {
 				if (rolledItem !== workflow.item) return true;
-				rollConfig.fastForward = true;
 				rollConfig.parts.push(numMinionsAttacked);
 				Hooks.off("dnd5e.preRollAttack", attackHookId);
 				return true;
@@ -50,19 +48,22 @@ export default {
 			if (!minionAttacks?.[workflow.id]) return true;
 			if (workflow.item.system?.damage?.parts?.length < 1) return true;
 
-			const numMinionsAttacked = minionAttacks[workflow.id];
-			delete minionAttacks[workflow.id];
-			const firstDamage = workflow.item.system.damage.parts[0][0];
-			const newFormula = isNaN(Number(firstDamage))
-				? firstDamage + " * " + numMinionsAttacked
-				: Number(firstDamage) * numMinionsAttacked;
+			const newDamageParts = [];
 
-			const damageType = workflow.item.system.damage.parts[0][1];
+			for (let index = 0; index < workflow.item.system.damage.parts.length; index++) {
+				const firstDamage = workflow.item.system.damage.parts[index][0];
+				const newFormula = isNaN(Number(firstDamage))
+					? "(" + firstDamage.toString() + " * " + minionAttacks[workflow.id].toString() + ")"
+					: Number(firstDamage) * minionAttacks[workflow.id];
+				const damageType = workflow.item.system.damage.parts[index][1];
+				newDamageParts.push(`${newFormula}${damageType ? `[${damageType}]` : ""}`);
+			}
+
+			delete minionAttacks[workflow.id];
 
 			const damageHookId = Hooks.on("dnd5e.preRollDamage", (rolledItem, rollConfig) => {
 				if (rolledItem !== workflow.item) return true;
-				rollConfig.fastForward = true;
-				rollConfig.parts[0] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
+				rollConfig.parts = newDamageParts;
 				Hooks.off("dnd5e.preRollDamage", damageHookId);
 				return true;
 			});
@@ -81,7 +82,7 @@ export default {
 		Hooks.on("midi-qol.preDamageRollComplete", async (workflow) => {
 
 			const validAttack = lib.isValidOverkillItem(workflow.item);
-			if(!validAttack) return true;
+			if (!validAttack) return true;
 			if (!workflow.hitTargets.size) return true;
 
 			const hitTarget = Array.from(workflow.hitTargets)[0]
@@ -155,7 +156,7 @@ export default {
 				workflow.item
 			);
 
-			if(lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
+			if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
 				ChatMessage.create({
 					content: `<h2>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Title")}</h2><p>${label1}</p>`
 				});

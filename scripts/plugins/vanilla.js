@@ -1,7 +1,6 @@
 import * as lib from "../lib.js";
 import CONSTANTS from "../constants.js";
 import * as api from "../api.js";
-import { getActiveGM } from "../lib.js";
 
 export default {
 
@@ -64,16 +63,21 @@ export default {
 
 			if (minionAttacks?.[item.parent.uuid]) {
 
-				const numMinionsAttacked = minionAttacks[item.parent.uuid].numMinionsAttacked;
+				for (let index = 0; index < item.system.damage.parts.length; index++) {
+
+					const firstDamage = item.system.damage.parts[index][0];
+					const newFormula = isNaN(Number(firstDamage))
+						? "(" + firstDamage.toString() + " * " + minionOnlyDamages[item.parent.uuid].numMinionsAttacked.toString() + ")"
+						: Number(firstDamage) * minionOnlyDamages[item.parent.uuid].numMinionsAttacked;
+
+					const damageType = item.system.damage.parts[index][1];
+
+					if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
+						rollConfig.parts[index] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
+					}
+				}
+
 				delete minionAttacks[item.parent.uuid];
-				const firstDamage = item.system.damage.parts[0][0];
-				const newFormula = isNaN(Number(firstDamage))
-					? firstDamage + " * " + numMinionsAttacked
-					: Number(firstDamage) * numMinionsAttacked;
-
-				const damageType = item.system.damage.parts[0][1];
-
-				rollConfig.parts[0] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
 
 				return true;
 
@@ -81,18 +85,22 @@ export default {
 
 				// If we've already prompted the user, and the attack hasn't gone through, then we continue the original attack
 				if (minionOnlyDamages[item.parent.uuid] && !minionOnlyDamages[item.parent.uuid].attacked) {
-					const firstDamage = item.system.damage.parts[0][0];
-					const newFormula = isNaN(Number(firstDamage))
-						? firstDamage + " * " + minionOnlyDamages[item.parent.uuid].numMinionsAttacked
-						: Number(firstDamage) * minionOnlyDamages[item.parent.uuid].numMinionsAttacked;
+
+					for (let index = 0; index < item.system.damage.parts.length; index++) {
+
+						const firstDamage = item.system.damage.parts[index][0];
+						const newFormula = isNaN(Number(firstDamage))
+							? "(" + firstDamage.toString() + " * " + minionOnlyDamages[item.parent.uuid].numMinionsAttacked.toString() + ")"
+							: Number(firstDamage) * minionOnlyDamages[item.parent.uuid].numMinionsAttacked;
+
+						const damageType = item.system.damage.parts[index][1];
+
+						if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
+							rollConfig.parts[index] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
+						}
+					}
 
 					delete minionOnlyDamages[item.parent.uuid];
-
-					const damageType = item.system.damage.parts[0][1];
-
-					if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
-						rollConfig.parts[0] = [`${newFormula}${damageType ? `[${damageType}]` : ""}`];
-					}
 
 					return true;
 				}
@@ -128,11 +136,11 @@ export default {
 		Hooks.on("dnd5e.rollDamage", async (item, damageRoll) => {
 
 			const validAttack = lib.isValidOverkillItem(item);
-			if(!validAttack) return true;
+			if (!validAttack) return true;
 
 			const hitTargets = Array.from(game.user.targets)
 
-			if(!hitTargets.length) return true;
+			if (!hitTargets.length) return true;
 
 			const hitTarget = hitTargets[0];
 
@@ -155,7 +163,7 @@ export default {
 				name: hitTarget.actor.name
 			});
 
-			if(lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
+			if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {
 				ChatMessage.create({
 					content: `<h2>${game.i18n.localize("MINIONMANAGER.Dialogs.OverkillDamage.Title")}</h2><p>${label1}</p>`
 				});

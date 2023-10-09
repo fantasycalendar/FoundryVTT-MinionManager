@@ -38,7 +38,7 @@ export function isValidOverkillItem(item) {
 
 }
 
-export function getActiveGM(){
+export function getActiveGM() {
 	return game.users
 		.filter(u => u.active && u.isGM)
 		.sort((a, b) => a.isGM && !b.isGM ? -1 : 1)?.[0];
