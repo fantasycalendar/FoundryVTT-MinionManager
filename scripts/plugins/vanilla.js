@@ -113,7 +113,7 @@ export default {
 
 			const hitTarget = hitTargets[0];
 
-			if (!api.isMinion(hitTarget) || api.isMinion(item.parent)) return true;
+			if (!hitTarget?.actor || !api.isMinion(hitTarget?.actor) || api.isMinion(item.parent)) return true;
 
 			let damageTotal = damageRoll.total;
 
@@ -129,7 +129,7 @@ export default {
 			const label1 = game.i18n.format(label1Localization, {
 				max_targets: maxAdditionalTargets + 1,
 				total_targets: game.user.targets.size,
-				name: hitTarget.actor.name
+				name: hitTarget?.actor?.name ?? "unknown"
 			});
 
 			if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE)) {

@@ -14,7 +14,7 @@ export default {
 
 			const isGroupAttack = getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 
-			if (!api.isMinion(workflow.actor) || !isGroupAttack) return true;
+			if (!workflow?.actor || !api.isMinion(workflow?.actor) || !isGroupAttack) return true;
 
 			const result = await Dialog.confirm({
 				title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
@@ -105,11 +105,11 @@ export default {
 
 			const hitTarget = Array.from(workflow.hitTargets)[0]
 
-			if (!api.isMinion(hitTarget.actor)) return true;
+			if (!hitTarget?.actor || !api.isMinion(hitTarget?.actor)) return true;
 
 			let damageTotal = workflow.damageTotal;
 
-			const minionHP = getProperty(hitTarget.actor, "system.attributes.hp.value");
+			const minionHP = getProperty(hitTarget?.actor, "system.attributes.hp.value");
 
 			if ((minionHP - damageTotal) > 0) return true;
 
@@ -118,9 +118,9 @@ export default {
 			const closestTokens = new Set(canvas.tokens.placeables
 				.filter(_token => {
 					const withinRange = canvas.grid.measureDistance(workflow.token, _token) <= workflow.item.system.range.value + 2.5;
-					return hitTarget.actor.name === _token.actor.name && withinRange;
+					return hitTarget?.actor && _token?.actor && hitTarget?.actor?.name === _token?.actor?.name && withinRange;
 				})
-				.sort((a, b) => canvas.grid.measureDistance(workflow.token, b) - canvas.grid.measureDistance(workflow.token, a)));
+				.sort((a, b) => canvas.grid.measureDistance(workflow.token, a) - canvas.grid.measureDistance(workflow.token, b)));
 
 			closestTokens.delete(game.user.targets.first());
 

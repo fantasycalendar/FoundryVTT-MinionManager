@@ -37,6 +37,7 @@ CONSTANTS["SETTING_KEYS"] = {
 	ENABLE_MINION_SUPER_SAVE: "enableMinionSuperSave",
 	MINION_FEATURE_NAME: "minionFeatureName",
 	MINION_FEATURE_DESCRIPTION: "minionFeatureDescription",
+	ENABLE_MINION_FEATURE_AUTOMATION: "enableMinionFeatureAutomation"
 }
 
 CONSTANTS["SETTINGS"] = {
