@@ -47,7 +47,7 @@ You can also include the identifier `@numberOfMinions` anywhere in the attacks t
 
 ## Group Initiative
 
-You can set this by right-clicking on the token HUD's "add to initiative" button to open the group initiative interface - clicking on a number within that UI moves all the selected tokens into that initiative group.
+You can set this by **right-clicking&& on the token HUD's "toggle battlemode" button (two crossed swords over a shield) to open the group initiative interface - clicking on a number within that UI moves all the selected tokens into that initiative group.
 
 Reducing or deleting any characters of a group does not affect the combat tracker, unless all of them are deleted or marked as defeated.
 
