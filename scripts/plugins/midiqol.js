@@ -37,7 +37,7 @@ export default {
 				if (rolledItem !== workflow.item) return true;
 				rollConfig.data.numberOfMinions = numberOfMinions;
 				const containsNumberOfMinions = rollConfig.parts.some(part => part[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS))
-				if(!containsNumberOfMinions) rollConfig.parts.push(CONSTANTS.NUMBER_MINIONS_BONUS);
+				if(!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
 				Hooks.off("dnd5e.preRollAttack", attackHookId);
 				return true;
 			});
@@ -77,7 +77,7 @@ export default {
 
 			const damageHookId = Hooks.on("dnd5e.preRollDamage", (rolledItem, rollConfig) => {
 				if (rolledItem !== workflow.item) return true;
-				rollConfig.data.numberOfMinions = numberOfMinions;
+				rollConfig.data.numberOfMinions = Math.max(0, numberOfMinions - 1);
 				rollConfig.parts = lib.patchItemDamageRollConfig(workflow.item);
 				Hooks.off("dnd5e.preRollDamage", damageHookId);
 				return true;
