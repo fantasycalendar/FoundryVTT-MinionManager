@@ -43,8 +43,9 @@ export default {
 
 				rollConfig.data.numberOfMinions = numberOfMinions;
 				if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
-					const containsNumberOfMinions = rollConfig.parts.some(part => part[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS))
-					if (!containsNumberOfMinions) rollConfig.parts.push(CONSTANTS.NUMBER_MINIONS_BONUS);
+					const containsNumberOfMinions = rollConfig.parts.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
+					rollConfig.parts = [];
+					if (!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
 				}
 
 				item.rollAttack(rollConfig);
@@ -64,7 +65,7 @@ export default {
 
 			if (minionAttacks?.[item.parent.uuid] && minionAttacks?.[item.parent.uuid].attacked) {
 
-				rollConfig.data.numberOfMinions = minionAttacks[item.parent.uuid].numberOfMinions;
+				rollConfig.data.numberOfMinions = Math.max(0, minionAttacks[item.parent.uuid].numberOfMinions - 1);
 				rollConfig.parts = lib.patchItemDamageRollConfig(item);
 
 				delete minionAttacks[item.parent.uuid];
