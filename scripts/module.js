@@ -13,15 +13,11 @@ Hooks.on("init", () => {
 });
 
 Hooks.once("ready", () => {
-	if (CONSTANTS.MODULES.MIDI) {
-		const flagName = CONSTANTS.FLAGS.MIDI_GROUP_ATTACK.split(".").pop();
-		CONFIG.DND5E.midiProperties[flagName] = "Group Action";
-	}
 	game.modules.get(CONSTANTS.MODULE_NAME).api = API;
 });
 
 function initializeSettings() {
-	for (const [key, setting] of Object.entries(CONSTANTS.SETTINGS)) {
+	for (const [key, setting] of Object.entries(CONSTANTS.SETTINGS())) {
 		game.settings.register(CONSTANTS.MODULE_NAME, key, setting);
 	}
 }

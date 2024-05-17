@@ -135,9 +135,7 @@ export async function revertMinions(actors) {
  * @returns {boolean}
  */
 export function isMinion(target) {
-	target = target?.actor ?? target;
-	const minionFeatureName = getSetting(CONSTANTS.SETTING_KEYS.MINION_FEATURE_NAME).toLowerCase();
-	return target.items.some(item => item.name.toLowerCase() === minionFeatureName);
+	return lib.hasActorItemNamed(target, getSetting(CONSTANTS.SETTING_KEYS.MINION_FEATURE_NAME), true)
 }
 
 /**

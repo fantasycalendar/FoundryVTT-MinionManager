@@ -41,18 +41,16 @@ div.token-image > img.minion-group{
     margin: 0;
     padding: 0;
     border-radius: 99px;
-    background-color: white;
     cursor: pointer;
-    position: relative;
+    max-width: initial !important;
+    opacity: 1;
+    background-color: white;
+    background-size: calc(100% + 2px) calc(100% + 2px) !important;
+    background-position: -1px -1px !important;
+    overflow: visible !important;
 }
 
-.grouped-initiative > .minion-group > img {
-    opacity: 1 !important;
-    margin: 0 !important;
-    left: -1px;
-    top: -1px;
-    width: 22px;
-    height: 22px;
-    position: absolute;
-    max-width: initial !important;
+.grouped-initiative > .minion-group.minion-group-used {
+    background-color: black;
+    box-shadow: inset 0px 0px 4px 1px rgba(255,255,255,1);
 }

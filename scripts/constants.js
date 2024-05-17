@@ -20,6 +20,7 @@ const CONSTANTS = {
 		GROUP_NUMBER: `${FLAG}.groupNumber`,
 		DELETE_GROUP_NUMBER: `${FLAG}.-=groupNumber`,
 		MIDI_GROUP_ATTACK: "flags.midiProperties.grpact",
+    MINION_FEATURE: `${FLAG}.minionfeature.`
 	},
 	MODULES: {
 		MIDI: false
@@ -40,98 +41,108 @@ CONSTANTS["SETTING_KEYS"] = {
 	ENABLE_MINION_FEATURE_AUTOMATION: "enableMinionFeatureAutomation"
 }
 
-CONSTANTS["SETTINGS"] = {
-	[CONSTANTS.SETTING_KEYS.DEBUG]: {
-		name: "MINIONMANAGER.Settings.Debug.Title",
-		hint: "MINIONMANAGER.Settings.Debug.Hint",
-		scope: "client",
-		config: true,
-		default: false,
-		type: Boolean
-	},
+/**
+ * @returns {{
+ *   Object
+ * }}
+ * @constructor
+ */
+CONSTANTS["SETTINGS"] = () => {
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_DAMAGE]: {
-		name: "MINIONMANAGER.Settings.EnableOverkillDamage.Title",
-		hint: "MINIONMANAGER.Settings.EnableOverkillDamage.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+	return {
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL]: {
-		name: "MINIONMANAGER.Settings.EnableRangedOverkill.Title",
-		hint: "MINIONMANAGER.Settings.EnableRangedOverkill.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.DEBUG]: {
+			name: "MINIONMANAGER.Settings.Debug.Title",
+			hint: "MINIONMANAGER.Settings.Debug.Hint",
+			scope: "client",
+			config: true,
+			default: false,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_SPELL_OVERKILL]: {
-		name: "MINIONMANAGER.Settings.EnableSpellOverkill.Title",
-		hint: "MINIONMANAGER.Settings.EnableSpellOverkill.Hint",
-		scope: "world",
-		config: true,
-		default: false,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_DAMAGE]: {
+			name: "MINIONMANAGER.Settings.EnableOverkillDamage.Title",
+			hint: "MINIONMANAGER.Settings.EnableOverkillDamage.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE]: {
-		name: "MINIONMANAGER.Settings.EnableOverkillMessage.Title",
-		hint: "MINIONMANAGER.Settings.EnableOverkillMessage.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_RANGED_OVERKILL]: {
+			name: "MINIONMANAGER.Settings.EnableRangedOverkill.Title",
+			hint: "MINIONMANAGER.Settings.EnableRangedOverkill.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS]: {
-		name: "MINIONMANAGER.Settings.EnableGroupAttacks.Title",
-		hint: "MINIONMANAGER.Settings.EnableGroupAttacks.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_SPELL_OVERKILL]: {
+			name: "MINIONMANAGER.Settings.EnableSpellOverkill.Title",
+			hint: "MINIONMANAGER.Settings.EnableSpellOverkill.Hint",
+			scope: "world",
+			config: true,
+			default: false,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS]: {
-		name: "MINIONMANAGER.Settings.EnableGroupAttackBonus.Title",
-		hint: "MINIONMANAGER.Settings.EnableGroupAttackBonus.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_OVERKILL_MESSAGE]: {
+			name: "MINIONMANAGER.Settings.EnableOverkillMessage.Title",
+			hint: "MINIONMANAGER.Settings.EnableOverkillMessage.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.ENABLE_MINION_SUPER_SAVE]: {
-		name: "MINIONMANAGER.Settings.EnableMinionSuperSave.Title",
-		hint: "MINIONMANAGER.Settings.EnableMinionSuperSave.Hint",
-		scope: "world",
-		config: true,
-		default: true,
-		type: Boolean
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS]: {
+			name: "MINIONMANAGER.Settings.EnableGroupAttacks.Title",
+			hint: "MINIONMANAGER.Settings.EnableGroupAttacks.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.MINION_FEATURE_NAME]: {
-		name: "MINIONMANAGER.Settings.MinionFeatureName.Title",
-		hint: "MINIONMANAGER.Settings.MinionFeatureName.Hint",
-		scope: "world",
-		config: true,
-		default: "Minion",
-		required: true,
-		type: String
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS]: {
+			name: "MINIONMANAGER.Settings.EnableGroupAttackBonus.Title",
+			hint: "MINIONMANAGER.Settings.EnableGroupAttackBonus.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
 
-	[CONSTANTS.SETTING_KEYS.MINION_FEATURE_DESCRIPTION]: {
-		name: "MINIONMANAGER.Settings.MinionFeatureDescription.Title",
-		hint: "MINIONMANAGER.Settings.MinionFeatureDescription.Hint",
-		scope: "world",
-		config: true,
-		default: "If the minion takes damage from an attack or as the result of a failed saving throw, their hit points are reduced to 0. If the minion takes damage from another effect, they die if the damage equals or exceeds their hit point maximum, otherwise they take no damage.",
-		required: true,
-		type: String
-	},
+		[CONSTANTS.SETTING_KEYS.ENABLE_MINION_SUPER_SAVE]: {
+			name: "MINIONMANAGER.Settings.EnableMinionSuperSave.Title",
+			hint: "MINIONMANAGER.Settings.EnableMinionSuperSave.Hint",
+			scope: "world",
+			config: true,
+			default: true,
+			type: Boolean
+		},
+
+		[CONSTANTS.SETTING_KEYS.MINION_FEATURE_NAME]: {
+			name: "MINIONMANAGER.Settings.MinionFeatureName.Title",
+			hint: "MINIONMANAGER.Settings.MinionFeatureName.Hint",
+			scope: "world",
+			config: true,
+			default: "Minion",
+			required: true,
+			type: String
+		},
+
+		[CONSTANTS.SETTING_KEYS.MINION_FEATURE_DESCRIPTION]: {
+			name: "MINIONMANAGER.Settings.MinionFeatureDescription.Title",
+			hint: "MINIONMANAGER.Settings.MinionFeatureDescription.Hint",
+			scope: "world",
+			config: true,
+			default: "If the minion takes damage from an attack or as the result of a failed saving throw, their hit points are reduced to 0. If the minion takes damage from another effect, they die if the damage equals or exceeds their hit point maximum, otherwise they take no damage.",
+			required: true,
+			type: String
+		}
+	}
 }
 
 

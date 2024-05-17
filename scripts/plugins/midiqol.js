@@ -118,7 +118,7 @@ export default {
 			const closestTokens = new Set(canvas.tokens.placeables
 				.filter(_token => {
 					const withinRange = canvas.grid.measureDistance(workflow.token, _token) <= workflow.item.system.range.value + 2.5;
-					return hitTarget?.actor && _token?.actor && hitTarget?.actor?.name === _token?.actor?.name && withinRange;
+					return hitTarget?.actor && _token?.actor && hitTarget.document?.baseActor?.name === _token?.document?.baseActor?.name && withinRange;
 				})
 				.sort((a, b) => canvas.grid.measureDistance(workflow.token, a) - canvas.grid.measureDistance(workflow.token, b)));
 
@@ -162,7 +162,7 @@ export default {
 			});
 
 			const userTargets = new Set([...game.user.targets]
-				.filter(_token => _token.name === hitTarget.name)
+				.filter(_token => _token.document.baseActor.name === hitTarget.document.baseActor.name)
 			);
 
 			userTargets.delete(hitTarget);

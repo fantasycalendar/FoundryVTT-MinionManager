@@ -107,8 +107,24 @@ export function initializeInitiative() {
 
 	let tokenBeingDeleted = false;
 	Hooks.on("preDeleteToken", (doc) => {
+		const groupNumber = getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
+		if (!groupNumber || !game.combats.viewed) return true;
+		const tokenCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		if(!tokenCombatant) return true;
 		tokenBeingDeleted = doc.id;
-	})
+	});
+
+	Hooks.on("deleteToken", async (doc) => {
+		if(doc.id !== tokenBeingDeleted) return;
+		const groupNumber = getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
+		const tokenCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		const subCombatants = foundry.utils.deepClone(getProperty(tokenCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
+		subCombatants.splice(subCombatants.indexOf(doc.uuid), 1);
+		await tokenCombatant.update({
+			[CONSTANTS.FLAGS.COMBATANTS]: subCombatants
+		});
+		ui.combat.render(true);
+	});
 
 	Hooks.on("preDeleteCombatant", (combatant) => {
 		if (tokenBeingDeleted !== combatant.tokenId) return true;

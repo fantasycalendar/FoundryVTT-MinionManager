@@ -49,3 +49,10 @@ export function patchItemDamageRollConfig(item){
 		return `${newFormula}${damageType ? `[${damageType}]` : ""}`
 	})
 }
+
+export function hasActorItemNamed(target, itemName, lowerCase=false){
+	target = target?.actor ?? target;
+	return target && target.items.some(item => {
+		return (lowerCase ? item.name.toLowerCase() : item.name) === (lowerCase ? itemName.toLowerCase() : itemName);
+	});
+}

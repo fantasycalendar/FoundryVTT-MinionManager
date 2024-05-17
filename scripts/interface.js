@@ -9,7 +9,8 @@ export function initializeInterface() {
 
 	Hooks.on("renderCombatTracker", async (app) => {
 		app.element.find(".combatant").each(function () {
-			const combatant = game.combats.viewed.combatants.get($(this).data("combatantId"));
+			const combatant = game.combats.viewed ? game.combats.viewed.combatants.get($(this).data("combatantId")) : null;
+			if (!combatant) return;
 			const minionGroup = foundry.utils.deepClone(getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER));
 			if (!minionGroup) return;
 			const tokenImageDiv = $("<div class='token-image'></div>");
@@ -45,7 +46,11 @@ export function initializeInterface() {
 
 				const newGroupNumber = Number(index) + 1;
 
-				const colorBox = $(`<div class="minion-group"><img src="modules/${CONSTANTS.MODULE_NAME}/assets/${newGroupNumber}.svg"/></div>`);
+				const groupAlreadyExists = game.combats.viewed ? game.combats.viewed.combatants.some(combatant => {
+					return getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
+				}) : false;
+
+				const colorBox = $(`<div class="minion-group ${groupAlreadyExists ? 'minion-group-used' : ''}" style='background-image: url(modules/${CONSTANTS.MODULE_NAME}/assets/${newGroupNumber}.svg);'></div>`);
 
 				colorBox.on("click", async () => {
 
@@ -56,9 +61,9 @@ export function initializeInterface() {
 						return !newTokens.includes(oldToken) && existingGroupNumber && tokenGroupNumber && existingGroupNumber === tokenGroupNumber;
 					});
 
-					const existingCombatantGroup = game.combats.viewed.combatants.find(combatant => {
+					const existingCombatantGroup = game.combats.viewed ? game.combats.viewed.combatants.find(combatant => {
 						return existingGroupNumber && getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === existingGroupNumber;
-					});
+					}) : false;
 
 					if (existingCombatantGroup && !tokensKeptInOldGroup.length) {
 						await existingCombatantGroup.delete()
@@ -84,9 +89,13 @@ export function initializeInterface() {
 							[CONSTANTS.FLAGS.GROUP_NUMBER]: newGroupNumber
 						})));
 
+						if (!game.combats.viewed) {
+							await Combat.create({ scene: canvas.scene.id });
+						}
+
 						const existingCombatantInNewGroup = game.combats.viewed.combatants.find(combatant => {
 							return getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
-						});
+						})
 
 						if (existingCombatantInNewGroup) {
 							const existingUuids = foundry.utils.deepClone(getProperty(existingCombatantInNewGroup, CONSTANTS.FLAGS.COMBATANTS) ?? []);
@@ -123,7 +132,8 @@ export function initializeInterface() {
 	libWrapper.register(CONSTANTS.MODULE_NAME, 'CombatTracker.prototype.getData', async function (wrapped, ...args) {
 		const data = await wrapped(...args);
 		for (const turn of data.turns) {
-			const combatant = game.combats.viewed.combatants.get(turn.id);
+			const combatant = game.combats.viewed ? game.combats.viewed.combatants.get(turn.id) : false;
+			if (!combatant) continue;
 			const subCombatants = foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
 			if (!subCombatants.length) continue;
 			const documents = subCombatants.map((uuid) => fromUuidSync(uuid)).filter(Boolean);
