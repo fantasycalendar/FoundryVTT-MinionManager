@@ -16,41 +16,52 @@ export default {
 
 			if (!api.isMinion(item.parent) || !isGroupAttack) return true;
 
-			// If we've already prompted the user, and the attack hasn't gone through, then we continue the original attack
-			if (minionAttacks[item.parent.uuid] && !minionAttacks[item.parent.uuid].attacked) {
+			// If we've already prompted the user, and the attack hasn't gone through (and we didn't prompt for a save DC), then we continue the original attack
+			if (minionAttacks[item.parent.uuid] && !minionAttacks[item.parent.uuid].attacked && !minionAttacks[item.parent.uuid].oldDC) {
 				minionAttacks[item.parent.uuid].attacked = true;
 				return true;
 			}
 
-			Dialog.confirm({
-				title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
-				content: `
-        <p>${game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Label")}</p>
-        <p><input name="numberOfAttacks" type="number" value="1"></p>
-      `,
-				yes: (html) => {
-					return html.find('input[name="numberOfAttacks"]').val()
-				},
-				options: { height: "100%" }
-			}).then(result => {
-
-				const numberOfMinions = Math.max(1, Number(result) || 1);
-
-				minionAttacks[item.parent.uuid] = {
-					numberOfMinions,
-					attacked: false
-				};
-
+			if (!minionAttacks[item.parent.uuid]) {
+				Dialog.confirm({
+					title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
+					content: `
+			<p>${game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Label")}</p>
+			<p><input name="numberOfAttacks" type="number" value="1"></p>
+		  `,
+					yes: (html) => {
+						return html.find('input[name="numberOfAttacks"]').val()
+					},
+					options: { height: "100%" }
+				}).then(result => {
+	
+					const numberOfMinions = Math.max(1, Number(result) || 1);
+	
+					minionAttacks[item.parent.uuid] = {
+						numberOfMinions,
+						attacked: false
+					};
+	
+					rollConfig.data.numberOfMinions = numberOfMinions;
+					if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
+						const containsNumberOfMinions = rollConfig.parts.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
+						rollConfig.parts = [];
+						if (!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
+					}
+	
+					item.rollAttack(rollConfig);
+	
+				});
+			} else {
+				const numberOfMinions = minionAttacks[item.parent.uuid].numberOfMinions;
 				rollConfig.data.numberOfMinions = numberOfMinions;
 				if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
 					const containsNumberOfMinions = rollConfig.parts.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
-					rollConfig.parts = [];
 					if (!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
 				}
-
-				item.rollAttack(rollConfig);
-
-			});
+				minionAttacks[item.parent.uuid].attacked = true;
+				return true;
+			}
 
 			return false;
 
@@ -102,6 +113,53 @@ export default {
 
 		});
 
+		Hooks.on("dnd5e.preUseItem", (item, config, options) => {
+			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
+
+			const isGroupAttack = getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+
+			const isScaleDC = getProperty(item, CONSTANTS.FLAGS.DC_SCALING_ENABLED) ?? false;
+
+			if (!api.isMinion(item.parent) || !isGroupAttack || !isScaleDC) return true;
+
+			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS)) return true;
+
+			if (!item.system.save || item.system.save?.ability == "" || !item.system.save?.dc) return true;
+
+			if (minionAttacks?.[item.parent.uuid]?.oldDC) return true;
+			Dialog.confirm({
+				title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
+				content: `
+		<p>${game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Label")}</p>
+		<p><input name="numberOfAttacks" type="number" value="1"></p>
+		`,
+				yes: (html) => {
+					return html.find('input[name="numberOfAttacks"]').val()
+				},
+				options: { height: "100%" }
+			}).then(result => {
+				const numberOfMinions = Math.max(1, Number(result) || 1)
+	
+				minionAttacks[item.parent.uuid] = {
+					numberOfMinions,
+					attacked: false,
+					oldDC: item.system.save?.dc
+				};
+	
+				item.system.save.dc = item.system.save.dc + (numberOfMinions > 1 ? numberOfMinions : 0);
+				item.use(config, options);
+			});
+			return false;
+		});
+
+		Hooks.on("dnd5e.useItem", async (item) => {
+			let minionAttackData = minionAttacks?.[item.parent.uuid];
+			if (minionAttackData?.oldDC) {
+				item.system.save.dc = minionAttackData.oldDC;
+			}
+			if (!item.hasAttack) delete minionAttacks?.[item.parent.uuid];
+			return true;
+		});
 
 		Hooks.on("dnd5e.rollDamage", async (item, damageRoll) => {
 

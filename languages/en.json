@@ -21,6 +21,11 @@
       "TurnIntoMinionFeature": "Set as minion group attack",
       "RevertFromMinionFeature": "Set as regular attack"
     },
+    "ItemOverrides": {
+      "ScaleDC": "DC scales with minions",
+      "Enabled": "Enabled",
+      "GroupAttack": "Is a minion group attack"
+    },
     "Errors": {
       "MidiActive": "MidiQOL is required for Minion Manager to function! Please install & activate the module."
     },
@@ -56,6 +61,10 @@
       "EnableGroupAttackBonus": {
         "Title": "Enable Minion Group Attack Bonus",
         "Hint": "When enabled, minions get a bonus to their group attack rolls equal to the number of attacking minions."
+      },
+      "EnableGroupDCBonus": {
+        "Title": "Enable Minion Group DC Bonus",
+        "Hint": "When enabled, minions get a bonus to the DC of any of their group attack rolls equal to the number of attacking minions."
       },
       "EnableMinionSuperSave": {
         "Title": "Enable Minion Super Saves",
