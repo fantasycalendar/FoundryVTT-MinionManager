@@ -20,7 +20,8 @@ const CONSTANTS = {
 		GROUP_NUMBER: `${FLAG}.groupNumber`,
 		DELETE_GROUP_NUMBER: `${FLAG}.-=groupNumber`,
 		MIDI_GROUP_ATTACK: "flags.midiProperties.grpact",
-    MINION_FEATURE: `${FLAG}.minionfeature.`
+    	MINION_FEATURE: `${FLAG}.minionfeature.`,
+		DC_SCALING_ENABLED: `${FLAG}.dcScaling`
 	},
 	MODULES: {
 		MIDI: false
@@ -35,6 +36,7 @@ CONSTANTS["SETTING_KEYS"] = {
 	ENABLE_OVERKILL_MESSAGE: "enableOverkillMessage",
 	ENABLE_GROUP_ATTACKS: "enableGroupAttacks",
 	ENABLE_GROUP_ATTACK_BONUS: "enableGroupAttackBonus",
+	ENABLE_GROUP_DC_BONUS: "enableGroupDCBonus",
 	ENABLE_MINION_SUPER_SAVE: "enableMinionSuperSave",
 	MINION_FEATURE_NAME: "minionFeatureName",
 	MINION_FEATURE_DESCRIPTION: "minionFeatureDescription",
@@ -113,6 +115,15 @@ CONSTANTS["SETTINGS"] = () => {
 			default: true,
 			type: Boolean
 		},
+
+	[CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS]: {
+		name: "MINIONMANAGER.Settings.EnableGroupDCBonus.Title",
+		hint: "MINIONMANAGER.Settings.EnableGroupDCBonus.Hint",
+		scope: "world",
+		config: true,
+		default: true,
+		type: Boolean
+	},
 
 		[CONSTANTS.SETTING_KEYS.ENABLE_MINION_SUPER_SAVE]: {
 			name: "MINIONMANAGER.Settings.EnableMinionSuperSave.Title",

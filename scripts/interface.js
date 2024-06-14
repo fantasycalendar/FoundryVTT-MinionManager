@@ -194,6 +194,7 @@ export function initializeInterface() {
 
 	Hooks.on("dnd5e.getItemContextOptions", (item, menuItems) => {
 		const actor = item.parent;
+		const isGroupAttackable = ["feat", "weapon", "spell"].includes(item.type);
 		menuItems.push({
 			name: game.i18n.localize("MINIONMANAGER.ItemContextMenu.TurnIntoMinionFeature"),
 			icon: `<i class="fas fa-users"></i>`,
@@ -201,7 +202,7 @@ export function initializeInterface() {
 				return api.setActorItemToGroupAttack(item, true);
 			},
 			condition: () => {
-				return game.user.isGM && !api.isItemGroupAttack(item) && api.isMinion(actor);
+				return game.user.isGM && !api.isItemGroupAttack(item) && api.isMinion(actor) && isGroupAttackable;
 			}
 		}, {
 			name: game.i18n.localize("MINIONMANAGER.ItemContextMenu.RevertFromMinionFeature"),
@@ -210,7 +211,7 @@ export function initializeInterface() {
 				return api.setActorItemToGroupAttack(item, false);
 			},
 			condition: () => {
-				return game.user.isGM && api.isItemGroupAttack(item) && api.isMinion(actor);
+				return game.user.isGM && api.isItemGroupAttack(item) && api.isMinion(actor) && isGroupAttackable;
 			}
 		});
 	});

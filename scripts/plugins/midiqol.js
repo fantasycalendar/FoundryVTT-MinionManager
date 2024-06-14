@@ -83,10 +83,45 @@ export default {
 				return true;
 			});
 
-			delete minionAttacks[workflow.id];
+			if (!workflow.hasSave) delete minionAttacks[workflow.id];
 
 			return true;
 
+		});
+
+		Hooks.on("midi-qol.preCheckSaves", async (workflow) => {
+			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
+
+			const isGroupAttack = getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+
+			const isScaleDC = getProperty(workflow.item, CONSTANTS.FLAGS.DC_SCALING_ENABLED) ?? false;
+
+			if (!workflow.actor || !api.isMinion(workflow?.actor) || !isGroupAttack || !isScaleDC) return true;
+
+			if (!minionAttacks?.[workflow.id]) {
+				const result = await Dialog.confirm({
+					title: game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Title"),
+					content: `
+			<p>${game.i18n.localize("MINIONMANAGER.Dialogs.MinionAttack.Label")}</p>
+			<p><input name="numberOfAttacks" type="number" value="1"></p>
+		  `,
+					yes: (html) => {
+						return html.find('input[name="numberOfAttacks"]').val()
+					},
+					options: { height: "100%" }
+				})
+	
+				minionAttacks[workflow.id] = Math.max(1, Number(result) || 1);;
+			}
+
+			const numberOfMinions = minionAttacks[workflow.id];
+
+			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS)) return true;
+			
+			workflow.item = workflow.item.clone({"system.save": {"dc": workflow.item.system.save.dc + (numberOfMinions > 1 ? numberOfMinions : 0), "scaling": "flat"}}, {"keepId": true});
+			workflow.item.prepareData();
+			workflow.item.prepareFinalAttributes();
+			delete minionAttacks[workflow.id];
 		});
 
 		Hooks.on("midi-qol.postCheckSaves", async (workflow) => {
