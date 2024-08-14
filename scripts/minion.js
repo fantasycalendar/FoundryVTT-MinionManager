@@ -13,8 +13,8 @@ export function initializeMinions() {
 
 	Hooks.on("preUpdateActor", (doc, change) => {
 		const actorIsMinion = api.isMinion(doc);
-		if (!actorIsMinion || !hasProperty(change, "system.attributes.hp.value")) return true;
-		if (getProperty(change, "system.attributes.hp.value") < getProperty(doc, "system.attributes.hp.value")) {
+		if (!actorIsMinion || !foundry.utils.hasProperty(change, "system.attributes.hp.value")) return true;
+		if (foundry.utils.getProperty(change, "system.attributes.hp.value") < foundry.utils.getProperty(doc, "system.attributes.hp.value")) {
 			change["system.attributes.hp.value"] = 0;
 		}
 		return true;
@@ -22,15 +22,15 @@ export function initializeMinions() {
 
 	Hooks.on("updateActor", (doc) => {
 		const actorIsMinion = api.isMinion(doc);
-		if (!doc.token || !actorIsMinion || getProperty(doc, "system.attributes.hp.value") > 0) return true;
-		const groupNumber = getProperty(doc.token, CONSTANTS.FLAGS.GROUP_NUMBER);
+		if (!doc.token || !actorIsMinion || foundry.utils.getProperty(doc, "system.attributes.hp.value") > 0) return true;
+		const groupNumber = foundry.utils.getProperty(doc.token, CONSTANTS.FLAGS.GROUP_NUMBER);
 		if (!groupNumber || !game.combats.viewed) return true;
-		const existingCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		const existingCombatant = game.combats.viewed.combatants.find(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
 		if (!existingCombatant) return true;
-		const existingSubCombatants = foundry.utils.deepClone(getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS));
+		const existingSubCombatants = foundry.utils.deepClone(foundry.utils.getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS));
 		if (!existingSubCombatants?.length) return true;
 		const newToken = existingSubCombatants.map(uuid => fromUuidSync(uuid)).filter(foundToken => {
-			return foundToken?.actor?.id && getProperty(foundToken?.actor, "system.attributes.hp.value") > 0;
+			return foundToken?.actor?.id && foundry.utils.getProperty(foundToken?.actor, "system.attributes.hp.value") > 0;
 		});
 		if (!newToken.length) return true;
 		existingCombatant.update({
@@ -45,13 +45,13 @@ export function initializeMinions() {
 		const actorIsMinion = api.isMinion(doc);
 		if(!actorIsMinion) return;
 
-		const groupNumber = getProperty(doc.token, CONSTANTS.FLAGS.GROUP_NUMBER);
+		const groupNumber = foundry.utils.getProperty(doc.token, CONSTANTS.FLAGS.GROUP_NUMBER);
 		if (!groupNumber) return;
 
-		const existingCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		const existingCombatant = game.combats.viewed.combatants.find(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
 		if (!existingCombatant) return;
 
-		const subCombatants = foundry.utils.deepClone(getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
+		const subCombatants = foundry.utils.deepClone(foundry.utils.getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
 		if (!subCombatants.length) return;
 
 		const documents = subCombatants.map((uuid) => fromUuidSync(uuid)).filter(Boolean);
