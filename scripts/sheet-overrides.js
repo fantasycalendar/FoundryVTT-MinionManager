@@ -58,7 +58,7 @@ function patchTidyGroupAttack(element, item) {
 }
 
 function patchDCScaling(html, item) {
-    if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS) && getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK)) {
+    if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS) && foundry.utils.getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK)) {
         let targetElem = html.find('[name="system.save.ability"]')?.parent()?.parent()?.[0];
         if (!targetElem) return;
         $(getDCScalingHtml(item)).insertAfter(targetElem);
@@ -66,7 +66,7 @@ function patchDCScaling(html, item) {
 }
 
 function patchTidyDCScaling(element, item) {
-    if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS) && getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK)) {
+    if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_DC_BONUS) && foundry.utils.getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK)) {
         const html = $(element);
         const markupToInject = `
             <div style="display: contents;" data-tidy-render-scheme="handlebars">
