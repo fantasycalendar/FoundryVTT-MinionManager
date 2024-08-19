@@ -158,7 +158,7 @@ export function setActorItemToGroupAttack(item, isGroupAttack = false) {
  * @returns {boolean}
  */
 export function isItemGroupAttack(item) {
-	return getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+	return foundry.utils.getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 }
 
 /**
