@@ -37,7 +37,7 @@ export default {
 				if (rolledItem !== workflow.item) return true;
 				rollConfig.data.numberOfMinions = numberOfMinions;
 				const containsNumberOfMinions = rollConfig.parts.some(part => part[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS))
-				if(!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
+				if(!containsNumberOfMinions && numberOfMinions > 1) rollConfig.parts.push( CONSTANTS.NUMBER_MINIONS_BONUS);
 				Hooks.off("dnd5e.preRollAttack", attackHookId);
 				return true;
 			});
