@@ -12,7 +12,7 @@ export default {
 
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
 
-			const isGroupAttack = getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+			const isGroupAttack = foundry.utils.getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 
 			if (!workflow?.actor || !api.isMinion(workflow?.actor) || !isGroupAttack) return true;
 
@@ -51,7 +51,7 @@ export default {
 
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
 
-			const isGroupAttack = getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+			const isGroupAttack = foundry.utils.getProperty(workflow.item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 
 			if (!api.isMinion(workflow.actor) || !isGroupAttack) return true;
 
@@ -144,7 +144,7 @@ export default {
 
 			let damageTotal = workflow.damageTotal;
 
-			const minionHP = getProperty(hitTarget?.actor, "system.attributes.hp.value");
+			const minionHP = foundry.utils.getProperty(hitTarget?.actor, "system.attributes.hp.value");
 
 			if ((minionHP - damageTotal) > 0) return true;
 

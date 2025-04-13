@@ -12,7 +12,7 @@ export default {
 
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
 
-			const isGroupAttack = getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+			const isGroupAttack = foundry.utils.getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 
 			if (!api.isMinion(item.parent) || !isGroupAttack) return true;
 
@@ -71,7 +71,7 @@ export default {
 
 			if (item.system?.damage?.parts?.length < 1) return true;
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
-			const isGroupAttack = getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
+			const isGroupAttack = foundry.utils.getProperty(item, CONSTANTS.FLAGS.MIDI_GROUP_ATTACK) ?? false;
 			if (!api.isMinion(item.parent) || !isGroupAttack) return true;
 
 			if (minionAttacks?.[item.parent.uuid] && minionAttacks?.[item.parent.uuid].attacked) {
@@ -176,7 +176,7 @@ export default {
 
 			let damageTotal = damageRoll.total;
 
-			const minionHP = getProperty(hitTarget.actor, "system.attributes.hp.value");
+			const minionHP = foundry.utils.getProperty(hitTarget.actor, "system.attributes.hp.value");
 
 			if ((minionHP - damageTotal) > 0) return true;
 

@@ -56,3 +56,35 @@ export function hasActorItemNamed(target, itemName, lowerCase=false){
 		return (lowerCase ? item.name.toLowerCase() : item.name) === (lowerCase ? itemName.toLowerCase() : itemName);
 	});
 }
+
+export function propertyConditionComparison(actor, condition) {
+	const propValue = foundry.utils.getProperty(actor, condition.property);
+	switch(condition.comparison) {
+		case "equals":
+			return propValue === condition.value;
+		case "soft_equals":
+			return (propValue ?? false) === condition.value;
+		case "less_equals":
+			return (propValue ?? 0) <= condition.value;
+		case "less":
+			return (propValue ?? 0) < condition.value;
+		case "greater_equals":
+			return (propValue ?? 0) >= condition.value;
+		case "greater":
+			return (propValue ?? 0) > condition.value;
+	}
+	return false;
+}
+
+
+export async function transformActionData(actor, data){
+	const entries = Object.entries(data);
+	let actorRollData = false;
+	for(const entry of entries){
+		if(entry[1].startsWith("@")){
+			actorRollData ||= actor.getRollData();
+			entry[1] = foundry.utils.getProperty(actorRollData, entry[1].slice(1));
+		}
+	}
+	return Object.fromEntries(entries);
+}

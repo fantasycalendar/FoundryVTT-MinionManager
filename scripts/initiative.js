@@ -5,7 +5,7 @@ export function refreshInitiativeGroupGraphics(t) {
 	const tokenDocument = t?.document ?? t;
 	const tokenObject = t?.object ?? t;
 
-	const minionTurn = foundry.utils.deepClone(getProperty(tokenDocument, CONSTANTS.FLAGS.GROUP_NUMBER));
+	const minionTurn = foundry.utils.deepClone(foundry.utils.getProperty(tokenDocument, CONSTANTS.FLAGS.GROUP_NUMBER));
 	const existingSprite = tokenObject.children.find(graphic => graphic.minionGroupCircle);
 
 	if (existingSprite && !minionTurn) {
@@ -61,11 +61,11 @@ export function initializeInitiative() {
 		if (!game.combats.viewed) return;
 		const combatUpdates = {};
 		for (const createdToken of tokensCreated) {
-			const groupNumber = getProperty(createdToken, CONSTANTS.FLAGS.GROUP_NUMBER);
+			const groupNumber = foundry.utils.getProperty(createdToken, CONSTANTS.FLAGS.GROUP_NUMBER);
 			if (!groupNumber || !game.combats.viewed) continue;
-			const existingCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+			const existingCombatant = game.combats.viewed.combatants.find(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
 			if (!existingCombatant) continue;
-			combatUpdates[existingCombatant.id] = combatUpdates[existingCombatant.id] ?? foundry.utils.deepClone(getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? []);
+			combatUpdates[existingCombatant.id] = combatUpdates[existingCombatant.id] ?? foundry.utils.deepClone(foundry.utils.getProperty(existingCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? []);
 			combatUpdates[existingCombatant.id].push(createdToken.uuid);
 		}
 		await game.combats.viewed.updateEmbeddedDocuments("Combatant", Object.entries(combatUpdates).map(([_id, uuids]) => ({
@@ -81,7 +81,7 @@ export function initializeInitiative() {
 
 	Hooks.on("deleteCombatant", async (combatant) => {
 		const tokenUpdates = [];
-		for (const subCombatantUuid of (getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])) {
+		for (const subCombatantUuid of (foundry.utils.getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])) {
 			const combatantToken = fromUuidSync(subCombatantUuid);
 			if (!combatantToken) continue;
 			tokenUpdates.push({
@@ -100,25 +100,25 @@ export function initializeInitiative() {
 
 	Hooks.on("preCreateCombatant", (doc) => {
 		const createdCombatantToken = doc.token;
-		const groupNumber = getProperty(createdCombatantToken, CONSTANTS.FLAGS.GROUP_NUMBER);
+		const groupNumber = foundry.utils.getProperty(createdCombatantToken, CONSTANTS.FLAGS.GROUP_NUMBER);
 		if (!groupNumber || !game.combats.viewed) return true;
-		return !game.combats.viewed.combatants.some(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		return !game.combats.viewed.combatants.some(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
 	})
 
 	let tokenBeingDeleted = false;
 	Hooks.on("preDeleteToken", (doc) => {
-		const groupNumber = getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
+		const groupNumber = foundry.utils.getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
 		if (!groupNumber || !game.combats.viewed) return true;
-		const tokenCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		const tokenCombatant = game.combats.viewed.combatants.find(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
 		if(!tokenCombatant) return true;
 		tokenBeingDeleted = doc.id;
 	});
 
 	Hooks.on("deleteToken", async (doc) => {
 		if(doc.id !== tokenBeingDeleted) return;
-		const groupNumber = getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
-		const tokenCombatant = game.combats.viewed.combatants.find(combatant => getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
-		const subCombatants = foundry.utils.deepClone(getProperty(tokenCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
+		const groupNumber = foundry.utils.getProperty(doc, CONSTANTS.FLAGS.GROUP_NUMBER);
+		const tokenCombatant = game.combats.viewed.combatants.find(combatant => foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === groupNumber);
+		const subCombatants = foundry.utils.deepClone(foundry.utils.getProperty(tokenCombatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
 		subCombatants.splice(subCombatants.indexOf(doc.uuid), 1);
 		await tokenCombatant.update({
 			[CONSTANTS.FLAGS.COMBATANTS]: subCombatants
@@ -128,7 +128,7 @@ export function initializeInitiative() {
 
 	Hooks.on("preDeleteCombatant", (combatant) => {
 		if (tokenBeingDeleted !== combatant.tokenId) return true;
-		const existingSubCombatants = foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS));
+		const existingSubCombatants = foundry.utils.deepClone(foundry.utils.getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS));
 		if (!existingSubCombatants?.length) return true;
 		const newToken = existingSubCombatants.map(uuid => fromUuidSync(uuid)).filter(foundToken => foundToken?.actor?.id);
 		if (!newToken.length) return true;

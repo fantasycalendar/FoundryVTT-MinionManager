@@ -11,7 +11,7 @@ export function initializeInterface() {
 		app.element.find(".combatant").each(function () {
 			const combatant = game.combats.viewed ? game.combats.viewed.combatants.get($(this).data("combatantId")) : null;
 			if (!combatant) return;
-			const minionGroup = foundry.utils.deepClone(getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER));
+			const minionGroup = foundry.utils.deepClone(foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER));
 			if (!minionGroup) return;
 			const tokenImageDiv = $("<div class='token-image'></div>");
 			tokenImageDiv.append($(this).find(".token-image"));
@@ -24,7 +24,7 @@ export function initializeInterface() {
 				event.stopPropagation();
 				const isOn = !combatant.isDefeated;
 				const status = CONFIG.statusEffects.find(e => e.id === CONFIG.specialStatusEffects.DEFEATED);
-				for (const uuid of foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS)) ?? []) {
+				for (const uuid of foundry.utils.deepClone(foundry.utils.getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS)) ?? []) {
 					const combatantToken = fromUuidSync(uuid);
 					if (!combatantToken || combatantToken === combatant.token) continue;
 					combatantToken.toggleActiveEffect(status, { overlay: true, active: isOn });
@@ -47,22 +47,22 @@ export function initializeInterface() {
 				const newGroupNumber = Number(index) + 1;
 
 				const groupAlreadyExists = game.combats.viewed ? game.combats.viewed.combatants.some(combatant => {
-					return getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
+					return foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
 				}) : false;
 
 				const colorBox = $(`<div class="minion-group ${groupAlreadyExists ? 'minion-group-used' : ''}" style='background-image: url(modules/${CONSTANTS.MODULE_NAME}/assets/${newGroupNumber}.svg);'></div>`);
 
 				colorBox.on("click", async () => {
 
-					const existingGroupNumber = getProperty(clickedTokenDocument, CONSTANTS.FLAGS.GROUP_NUMBER);
+					const existingGroupNumber = foundry.utils.getProperty(clickedTokenDocument, CONSTANTS.FLAGS.GROUP_NUMBER);
 					const newTokens = canvas.tokens.controlled.map(t => t.document);
 					const tokensKeptInOldGroup = canvas.scene.tokens.filter(oldToken => {
-						const tokenGroupNumber = getProperty(oldToken, CONSTANTS.FLAGS.GROUP_NUMBER);
+						const tokenGroupNumber = foundry.utils.getProperty(oldToken, CONSTANTS.FLAGS.GROUP_NUMBER);
 						return !newTokens.includes(oldToken) && existingGroupNumber && tokenGroupNumber && existingGroupNumber === tokenGroupNumber;
 					});
 
 					const existingCombatantGroup = game.combats.viewed ? game.combats.viewed.combatants.find(combatant => {
-						return existingGroupNumber && getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === existingGroupNumber;
+						return existingGroupNumber && foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === existingGroupNumber;
 					}) : false;
 
 					if (existingCombatantGroup && !tokensKeptInOldGroup.length) {
@@ -94,11 +94,11 @@ export function initializeInterface() {
 						}
 
 						const existingCombatantInNewGroup = game.combats.viewed.combatants.find(combatant => {
-							return getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
+							return foundry.utils.getProperty(combatant.token, CONSTANTS.FLAGS.GROUP_NUMBER) === newGroupNumber;
 						})
 
 						if (existingCombatantInNewGroup) {
-							const existingUuids = foundry.utils.deepClone(getProperty(existingCombatantInNewGroup, CONSTANTS.FLAGS.COMBATANTS) ?? []);
+							const existingUuids = foundry.utils.deepClone(foundry.utils.getProperty(existingCombatantInNewGroup, CONSTANTS.FLAGS.COMBATANTS) ?? []);
 							const newUuids = newTokens.map(selectedToken => {
 								return `Scene.${selectedToken.parent.id}.Token.${selectedToken.id}`;
 							});
@@ -134,7 +134,7 @@ export function initializeInterface() {
 		for (const turn of data.turns) {
 			const combatant = game.combats.viewed ? game.combats.viewed.combatants.get(turn.id) : false;
 			if (!combatant) continue;
-			const subCombatants = foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
+			const subCombatants = foundry.utils.deepClone(foundry.utils.getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS) ?? [])
 			if (!subCombatants.length) continue;
 			const documents = subCombatants.map((uuid) => fromUuidSync(uuid)).filter(Boolean);
 			turn.defeated = documents.every(subTokenDocument => {
@@ -153,7 +153,7 @@ export function initializeInterface() {
 
 	Hooks.on("preUpdateCombatant", (combatant, data) => {
 		if (overrideDefeatedClick) return;
-		const existingSubCombatants = foundry.utils.deepClone(getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS));
+		const existingSubCombatants = foundry.utils.deepClone(foundry.utils.getProperty(combatant, CONSTANTS.FLAGS.COMBATANTS));
 		if (!existingSubCombatants?.length) return;
 		if (data.defeated) return false;
 	});
