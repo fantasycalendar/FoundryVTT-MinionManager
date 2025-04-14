@@ -8,7 +8,9 @@ export default {
 
 		const minionAttacks = {};
 
-		Hooks.on("dnd5e.preRollAttack", (item, rollConfig) => {
+		Hooks.on("dnd5e.preRollAttack", (item, data) => {
+
+      const rollConfig = data?.rollConfig ?? data;
 
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
 
@@ -34,23 +36,23 @@ export default {
 					},
 					options: { height: "100%" }
 				}).then(result => {
-	
+
 					const numberOfMinions = Math.max(1, Number(result) || 1);
-	
+
 					minionAttacks[item.parent.uuid] = {
 						numberOfMinions,
 						attacked: false
 					};
-	
+
 					rollConfig.data.numberOfMinions = numberOfMinions;
 					if (lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACK_BONUS)) {
 						const containsNumberOfMinions = rollConfig.parts.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
 						rollConfig.parts = [];
 						if (!containsNumberOfMinions) rollConfig.parts.push(numberOfMinions > 1 ? CONSTANTS.NUMBER_MINIONS_BONUS : '');
 					}
-	
+
 					item.rollAttack(rollConfig);
-	
+
 				});
 			} else {
 				const numberOfMinions = minionAttacks[item.parent.uuid].numberOfMinions;
@@ -67,7 +69,9 @@ export default {
 
 		});
 
-		Hooks.on("dnd5e.preRollDamage", (item, rollConfig) => {
+		Hooks.on("dnd5e.preRollDamage", (item, data) => {
+
+      const rollConfig = data?.rollConfig ?? data;
 
 			if (item.system?.damage?.parts?.length < 1) return true;
 			if (!lib.getSetting(CONSTANTS.SETTING_KEYS.ENABLE_GROUP_ATTACKS)) return true;
@@ -77,7 +81,7 @@ export default {
 			if (minionAttacks?.[item.parent.uuid] && minionAttacks?.[item.parent.uuid].attacked) {
 
 				rollConfig.data.numberOfMinions = Math.max(0, minionAttacks[item.parent.uuid].numberOfMinions - 1);
-				rollConfig.parts = lib.patchItemDamageRollConfig(item);
+				lib.patchRollConfig(rollConfig);
 
 				delete minionAttacks[item.parent.uuid];
 
@@ -139,13 +143,13 @@ export default {
 				options: { height: "100%" }
 			}).then(result => {
 				const numberOfMinions = Math.max(1, Number(result) || 1)
-	
+
 				minionAttacks[item.parent.uuid] = {
 					numberOfMinions,
 					attacked: false,
 					oldDC: item.system.save?.dc
 				};
-	
+
 				item.system.save.dc = item.system.save.dc + (numberOfMinions > 1 ? numberOfMinions : 0);
 				item.use(config, options);
 			});

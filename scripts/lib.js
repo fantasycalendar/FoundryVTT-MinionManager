@@ -39,15 +39,25 @@ export function isValidOverkillItem(item) {
 }
 
 
-export function patchItemDamageRollConfig(item){
-	return (item.system?.damage?.parts ?? []).map((part) => {
-		const firstDamage = part[0].toString();
-		const containsNumberOfMinions = firstDamage.includes(CONSTANTS.NUMBER_MINIONS_BONUS);
-		const newFormula = containsNumberOfMinions ? firstDamage : `(${firstDamage} * ${CONSTANTS.NUMBER_MINIONS_BONUS})`;
-		const damageType = part[1];
-
-		return `${newFormula}${damageType ? `[${damageType}]` : ""}`
-	})
+export function patchRollConfig(rollConfig){
+	if(rollConfig?.rollConfigs?.length){
+		rollConfig.rollConfigs = rollConfig.rollConfigs.map(roll => {
+			for(let i = 0; i < roll.parts.length; i++){
+				if(!roll.parts[0].includes(CONSTANTS.NUMBER_MINIONS_BONUS)){
+					roll.parts[0] = `(${roll.parts[0]}) * ${CONSTANTS.NUMBER_MINIONS_BONUS}`;
+				}
+			}
+			return roll;
+		});
+	}else {
+		rollConfig.parts = rollConfig.parts.map(part => {
+			let [damage, damageType] = part;
+			if(!damage.includes(CONSTANTS.NUMBER_MINIONS_BONUS)){
+				damage = `(${damage}) * ${CONSTANTS.NUMBER_MINIONS_BONUS}`;
+			}
+			return [damage, damageType];
+		});
+	}
 }
 
 export function hasActorItemNamed(target, itemName, lowerCase=false){

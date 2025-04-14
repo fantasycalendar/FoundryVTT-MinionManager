@@ -1,6 +1,7 @@
 import * as lib from "../lib.js";
 import CONSTANTS from "../constants.js";
 import * as api from "../api.js";
+import { patchRollConfig } from "../lib.js";
 
 export default {
 
@@ -75,10 +76,11 @@ export default {
 
 			const numberOfMinions = minionAttacks[workflow.id];
 
-			const damageHookId = Hooks.on("dnd5e.preRollDamage", (rolledItem, rollConfig) => {
+			const damageHookId = Hooks.on("dnd5e.preRollDamage", (rolledItem, data) => {
+				const rollConfig = data?.rollConfig ?? data;
 				if (rolledItem !== workflow.item) return true;
 				rollConfig.data.numberOfMinions = Math.max(0, numberOfMinions - 1);
-				rollConfig.parts = lib.patchItemDamageRollConfig(workflow.item);
+				lib.patchRollConfig(rollConfig);
 				Hooks.off("dnd5e.preRollDamage", damageHookId);
 				return true;
 			});
